@@ -11,11 +11,9 @@ class FinalGeneratedBoard extends StatefulWidget {
 }
 
 class _FinalGeneratedBoardState extends State<FinalGeneratedBoard> {
-
-
-  var boardResources = new List(19);
-  var boardNumbers = new List(19);
-  var upsideDownOrNot = new List(2);
+  var boardResources;
+  var boardNumbers;
+  var upsideDownOrNot;
   bool disableButton = false;
   var desertIndex;
 
@@ -65,26 +63,34 @@ class _FinalGeneratedBoardState extends State<FinalGeneratedBoard> {
       'd'
     ];
     upsideDownOrNot = [0, math.pi];
+    //upsideDownOrNot = [0, math.pi / 6 * 2, math.pi / 6 * 4, math.pi];
   }
 
   @override
   Widget build(BuildContext context) {
+    // var offSetX_1 = MediaQuery.of(context).size.width * 0.13;
+    // var offSetY_1 = MediaQuery.of(context).size.width * 0.092;
+    // var fromOffSetY_1 = MediaQuery.of(context).size.width * 0.128;
+    // var tileWidth = MediaQuery.of(context).size.width * 0.148;
+    // var tileHeight = 436 * tileWidth / 389;
     var offSetX_1 = MediaQuery.of(context).size.width * 0.126;
     var offSetY_1 = MediaQuery.of(context).size.width * 0.084;
     var fromOffSetY_1 = MediaQuery.of(context).size.width * 0.128;
     var tileWidth = MediaQuery.of(context).size.width * 0.15;
     var tileHeight = 436 * tileWidth / 389;
 
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp
-    ]);
+    SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
     return Scaffold(
         backgroundColor: Colors.teal[100],
         appBar: AppBar(
+          backgroundColor: Colors.teal[300],
           title: Text(
             "Catan Board Generator!",
-            style: TextStyle(fontSize: 30),
+            style: TextStyle(
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           centerTitle: true,
         ),
@@ -98,6 +104,7 @@ class _FinalGeneratedBoardState extends State<FinalGeneratedBoard> {
                   angle: upsideDownOrNot[0].toDouble(),
                   child: Image(
                     image: AssetImage('assets/images/fullBoard.png'),
+                    //image: AssetImage('assets/new/fullBoard2.png'),
                   ),
                 ),
 
@@ -562,10 +569,10 @@ class _FinalGeneratedBoardState extends State<FinalGeneratedBoard> {
               enabled: disableButton ? false : true,
               height: tileHeight,
               width: tileWidth * 3.7,
-              color: Colors.green[200],
+              color: Colors.green[200] ?? Colors.green,
               shadowDegree: ShadowDegree.dark,
               child: Text(
-                "generate",
+                "Generate",
                 style: TextStyle(
                     fontSize: tileWidth * 0.6, color: Colors.green[900]),
               ),
@@ -586,26 +593,28 @@ class _FinalGeneratedBoardState extends State<FinalGeneratedBoard> {
               enabled: disableButton ? false : true,
               height: tileHeight,
               width: tileWidth * 5.5,
-              color: Colors.green[200],
+              color: Colors.green[200] ?? Colors.green,
               shadowDegree: ShadowDegree.dark,
               child: Text(
                 "G E N E R A T E",
                 style: TextStyle(
-                    fontSize: tileWidth * 0.58, color: Colors.green[900]),
+                  fontSize: tileWidth * 0.58,
+                  color: Colors.green[900],
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               onPressed: () async {
                 HapticFeedback.mediumImpact();
                 disableButton = true;
                 for (var i = 0; i < 15; i++) {
-                  await Future.delayed(
-                      const Duration(milliseconds: 40), () {
+                  await Future.delayed(const Duration(milliseconds: 40), () {
                     setState(() {
                       sleep(Duration(milliseconds: 20));
                       boardResources.shuffle();
                       desertIndex = boardResources.indexOf('Desert');
                       boardNumbers.shuffle();
                       boardNumbers[boardNumbers.indexOf('d')] =
-                      boardNumbers[desertIndex];
+                          boardNumbers[desertIndex];
                       boardNumbers[desertIndex] = 'd';
                       upsideDownOrNot.shuffle();
                     });
@@ -614,7 +623,6 @@ class _FinalGeneratedBoardState extends State<FinalGeneratedBoard> {
                 disableButton = false;
               },
             ),
-
           ],
         ));
   }
