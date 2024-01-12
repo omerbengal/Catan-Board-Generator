@@ -23,7 +23,7 @@ class ExpansionBoardScreen extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: ExpansionBoardAndBUttons(),
+      body: ExpansionBoardAndButtons(),
       bottomNavigationBar: BottomAppBar(
         color: Colors.teal[300],
         height: MediaQuery.of(context).size.height * 0.08,

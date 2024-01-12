@@ -21,7 +21,7 @@ class _MainScreenState extends State<MainScreen> {
   // Holds the pages and their order
   final List<Widget> _pages = [
     RegularBoardAndButtons(),
-    ExpansionBoardAndBUttons(),
+    ExpansionBoardAndButtons(),
     DiceScreen(),
   ];
   // Holds the colors of the bottom navigation bar based on the order of the pages

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 
-class ExpansionBoardAndBUttons extends StatefulWidget {
-  const ExpansionBoardAndBUttons({Key? key}) : super(key: key);
+class ExpansionBoardAndButtons extends StatefulWidget {
+  const ExpansionBoardAndButtons({Key? key}) : super(key: key);
 
   @override
-  State<ExpansionBoardAndBUttons> createState() =>
-      _ExpansionBoardAndBUttonsState();
+  State<ExpansionBoardAndButtons> createState() =>
+      _ExpansionBoardAndButtonsState();
 }
 
-class _ExpansionBoardAndBUttonsState extends State<ExpansionBoardAndBUttons> {
+class _ExpansionBoardAndButtonsState extends State<ExpansionBoardAndButtons> {
   @override
   Widget build(BuildContext context) {
     return Center(
