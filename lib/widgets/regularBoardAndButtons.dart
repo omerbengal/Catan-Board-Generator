@@ -13,68 +13,59 @@ class RegularBoardAndButtons extends StatefulWidget {
 }
 
 class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
-  var boardResources;
-  var boardNumbers;
-  var upsideDownOrNot;
+  List<String> boardResources = [
+    'Wood',
+    'Wood',
+    'Wood',
+    'Wood',
+    'Tit',
+    'Tit',
+    'Tit',
+    'Ore',
+    'Ore',
+    'Ore',
+    'Wheat',
+    'Wheat',
+    'Wheat',
+    'Wheat',
+    'Sheep',
+    'Sheep',
+    'Sheep',
+    'Sheep',
+    'Desert'
+  ];
+  List<String> boardNumbers = [
+    '2',
+    '3',
+    '3',
+    '4',
+    '4',
+    '5',
+    '5',
+    '6',
+    '6',
+    '8',
+    '8',
+    '9',
+    '9',
+    '10',
+    '10',
+    '11',
+    '11',
+    '12',
+    'd'
+  ];
+  List<double> upsideDownOrNot = [0, math.pi / 6 * 2, math.pi / 6 * 4, math.pi];
   bool disableButton = false;
   var desertIndex;
 
   @override
-  void initState() {
-    super.initState();
-    boardResources = [
-      'Wood',
-      'Wood',
-      'Wood',
-      'Wood',
-      'Tit',
-      'Tit',
-      'Tit',
-      'Ore',
-      'Ore',
-      'Ore',
-      'Wheat',
-      'Wheat',
-      'Wheat',
-      'Wheat',
-      'Sheep',
-      'Sheep',
-      'Sheep',
-      'Sheep',
-      'Desert'
-    ];
-    boardNumbers = [
-      '2',
-      '3',
-      '3',
-      '4',
-      '4',
-      '5',
-      '5',
-      '6',
-      '6',
-      '8',
-      '8',
-      '9',
-      '9',
-      '10',
-      '10',
-      '11',
-      '11',
-      '12',
-      'd'
-    ];
-    // upsideDownOrNot = [0, math.pi];
-    upsideDownOrNot = [0, math.pi / 6 * 2, math.pi / 6 * 4, math.pi];
-  }
-
-  @override
   Widget build(BuildContext context) {
     var offSetX_1 = MediaQuery.of(context).size.width * 0.13;
-    var offSetY_1 = MediaQuery.of(context).size.width * 0.092;
+    var offSetY_1 = MediaQuery.of(context).size.width * 0.091;
     var fromOffSetY_1 = MediaQuery.of(context).size.width * 0.128;
     var tileWidth = MediaQuery.of(context).size.width * 0.148;
-    var tileHeight = 436 * tileWidth / 389;
+    var tileHeight = 447 * tileWidth / 389;
 
     return Column(
       children: [
@@ -100,11 +91,14 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
             Positioned(
               top: offSetY_1,
               left: offSetX_1 + tileWidth,
-              child: Image(
+              child: Container(
                 width: tileWidth,
                 height: tileHeight,
-                image: AssetImage(
-                  'assets/images/' + boardResources[0] + '.png',
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/' + boardResources[0] + '.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -113,23 +107,30 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
             Positioned(
               top: offSetY_1,
               left: offSetX_1 + tileWidth * 2,
-              child: Image(
+              child: Container(
                 width: tileWidth,
                 height: tileHeight,
-                image: AssetImage(
-                  'assets/images/' + boardResources[1] + '.png',
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/' + boardResources[1] + '.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
+
             //#3
             Positioned(
               top: offSetY_1,
               left: offSetX_1 + tileWidth * 3,
-              child: Image(
+              child: Container(
                 width: tileWidth,
                 height: tileHeight,
-                image: AssetImage(
-                  'assets/images/' + boardResources[2] + '.png',
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/' + boardResources[2] + '.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -140,11 +141,14 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
             Positioned(
               top: offSetY_1 + fromOffSetY_1,
               left: offSetX_1 + tileWidth / 2,
-              child: Image(
+              child: Container(
                 width: tileWidth,
                 height: tileHeight,
-                image: AssetImage(
-                  'assets/images/' + boardResources[3] + '.png',
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/' + boardResources[3] + '.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -152,11 +156,14 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
             Positioned(
               top: offSetY_1 + fromOffSetY_1,
               left: offSetX_1 + tileWidth * 1.5,
-              child: Image(
+              child: Container(
                 width: tileWidth,
                 height: tileHeight,
-                image: AssetImage(
-                  'assets/images/' + boardResources[4] + '.png',
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/' + boardResources[4] + '.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -164,11 +171,14 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
             Positioned(
               top: offSetY_1 + fromOffSetY_1,
               left: offSetX_1 + tileWidth * 2.5,
-              child: Image(
+              child: Container(
                 width: tileWidth,
                 height: tileHeight,
-                image: AssetImage(
-                  'assets/images/' + boardResources[5] + '.png',
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/' + boardResources[5] + '.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -176,11 +186,14 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
             Positioned(
               top: offSetY_1 + fromOffSetY_1,
               left: offSetX_1 + tileWidth * 3.5,
-              child: Image(
+              child: Container(
                 width: tileWidth,
                 height: tileHeight,
-                image: AssetImage(
-                  'assets/images/' + boardResources[6] + '.png',
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/' + boardResources[6] + '.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -191,11 +204,14 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
             Positioned(
               top: offSetY_1 + fromOffSetY_1 * 2,
               left: offSetX_1,
-              child: Image(
+              child: Container(
                 width: tileWidth,
                 height: tileHeight,
-                image: AssetImage(
-                  'assets/images/' + boardResources[7] + '.png',
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/' + boardResources[7] + '.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -203,11 +219,14 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
             Positioned(
               top: offSetY_1 + fromOffSetY_1 * 2,
               left: offSetX_1 + tileWidth,
-              child: Image(
+              child: Container(
                 width: tileWidth,
                 height: tileHeight,
-                image: AssetImage(
-                  'assets/images/' + boardResources[8] + '.png',
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/' + boardResources[8] + '.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -215,11 +234,14 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
             Positioned(
               top: offSetY_1 + fromOffSetY_1 * 2,
               left: offSetX_1 + tileWidth * 2,
-              child: Image(
+              child: Container(
                 width: tileWidth,
                 height: tileHeight,
-                image: AssetImage(
-                  'assets/images/' + boardResources[9] + '.png',
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/' + boardResources[9] + '.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -227,11 +249,14 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
             Positioned(
               top: offSetY_1 + fromOffSetY_1 * 2,
               left: offSetX_1 + tileWidth * 3,
-              child: Image(
+              child: Container(
                 width: tileWidth,
                 height: tileHeight,
-                image: AssetImage(
-                  'assets/images/' + boardResources[10] + '.png',
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/' + boardResources[10] + '.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -239,11 +264,14 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
             Positioned(
               top: offSetY_1 + fromOffSetY_1 * 2,
               left: offSetX_1 + tileWidth * 4,
-              child: Image(
+              child: Container(
                 width: tileWidth,
                 height: tileHeight,
-                image: AssetImage(
-                  'assets/images/' + boardResources[11] + '.png',
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/' + boardResources[11] + '.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -254,11 +282,14 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
             Positioned(
               top: offSetY_1 + fromOffSetY_1 * 3,
               left: offSetX_1 + tileWidth / 2,
-              child: Image(
+              child: Container(
                 width: tileWidth,
                 height: tileHeight,
-                image: AssetImage(
-                  'assets/images/' + boardResources[12] + '.png',
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/' + boardResources[12] + '.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -266,11 +297,14 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
             Positioned(
               top: offSetY_1 + fromOffSetY_1 * 3,
               left: offSetX_1 + tileWidth * 1.5,
-              child: Image(
+              child: Container(
                 width: tileWidth,
                 height: tileHeight,
-                image: AssetImage(
-                  'assets/images/' + boardResources[13] + '.png',
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/' + boardResources[13] + '.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -278,11 +312,14 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
             Positioned(
               top: offSetY_1 + fromOffSetY_1 * 3,
               left: offSetX_1 + tileWidth * 2.5,
-              child: Image(
+              child: Container(
                 width: tileWidth,
                 height: tileHeight,
-                image: AssetImage(
-                  'assets/images/' + boardResources[14] + '.png',
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/' + boardResources[14] + '.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -290,11 +327,14 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
             Positioned(
               top: offSetY_1 + fromOffSetY_1 * 3,
               left: offSetX_1 + tileWidth * 3.5,
-              child: Image(
+              child: Container(
                 width: tileWidth,
                 height: tileHeight,
-                image: AssetImage(
-                  'assets/images/' + boardResources[15] + '.png',
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/' + boardResources[15] + '.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -305,11 +345,14 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
             Positioned(
               top: offSetY_1 + fromOffSetY_1 * 4,
               left: offSetX_1 + tileWidth,
-              child: Image(
+              child: Container(
                 width: tileWidth,
                 height: tileHeight,
-                image: AssetImage(
-                  'assets/images/' + boardResources[16] + '.png',
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/' + boardResources[16] + '.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -317,11 +360,14 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
             Positioned(
               top: offSetY_1 + fromOffSetY_1 * 4,
               left: offSetX_1 + tileWidth * 2,
-              child: Image(
+              child: Container(
                 width: tileWidth,
                 height: tileHeight,
-                image: AssetImage(
-                  'assets/images/' + boardResources[17] + '.png',
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/' + boardResources[17] + '.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
@@ -329,11 +375,14 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
             Positioned(
               top: offSetY_1 + fromOffSetY_1 * 4,
               left: offSetX_1 + tileWidth * 3,
-              child: Image(
+              child: Container(
                 width: tileWidth,
                 height: tileHeight,
-                image: AssetImage(
-                  'assets/images/' + boardResources[18] + '.png',
+                child: Image(
+                  image: AssetImage(
+                    'assets/images/' + boardResources[18] + '.png',
+                  ),
+                  fit: BoxFit.cover,
                 ),
               ),
             ),
