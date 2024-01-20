@@ -12,7 +12,8 @@ class RegularBoardAndButtons extends StatefulWidget {
   State<RegularBoardAndButtons> createState() => _RegularBoardAndButtonsState();
 }
 
-class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
+class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons>
+    with AutomaticKeepAliveClientMixin<RegularBoardAndButtons> {
   List<String> boardResources = [
     'Wood',
     'Wood',
@@ -61,11 +62,12 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
 
   @override
   Widget build(BuildContext context) {
-    var offSetX_1 = MediaQuery.of(context).size.width * 0.13;
-    var offSetY_1 = MediaQuery.of(context).size.width * 0.091;
-    var fromOffSetY_1 = MediaQuery.of(context).size.width * 0.128;
+    super.build(context);
+    var offSetX_1 = MediaQuery.of(context).size.width * 0.1295;
+    var offSetY_1 = MediaQuery.of(context).size.width * 0.088;
+    var fromOffSetY_1 = MediaQuery.of(context).size.width * 0.1286;
     var tileWidth = MediaQuery.of(context).size.width * 0.148;
-    var tileHeight = 447 * tileWidth / 389;
+    var tileHeight = 450 * tileWidth / 389;
 
     return Column(
       children: [
@@ -669,13 +671,12 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
           onPressed: () async {
             HapticFeedback.mediumImpact();
             disableButton = true;
-            for (var i = 0; i < 15; i++) {
+            for (var i = 0; i < 20; i++) {
               await Future.delayed(
                 const Duration(milliseconds: 40),
                 () {
                   setState(
                     () {
-                      sleep(Duration(milliseconds: 20));
                       boardResources.shuffle();
                       desertIndex = boardResources.indexOf('Desert');
                       boardNumbers.shuffle();
@@ -694,4 +695,7 @@ class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons> {
       ],
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

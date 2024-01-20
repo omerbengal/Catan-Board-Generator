@@ -7,9 +7,11 @@ class DiceScreen extends StatefulWidget {
   State<DiceScreen> createState() => _DiceScreenState();
 }
 
-class _DiceScreenState extends State<DiceScreen> {
+class _DiceScreenState extends State<DiceScreen>
+    with AutomaticKeepAliveClientMixin<DiceScreen> {
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Center(
       child: Text(
         "Dice Screen",
@@ -20,4 +22,7 @@ class _DiceScreenState extends State<DiceScreen> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

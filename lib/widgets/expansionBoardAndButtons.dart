@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'dart:io';
 import 'dart:math' as math;
 import 'package:animated_button/animated_button.dart';
 
@@ -13,7 +12,8 @@ class ExpansionBoardAndButtons extends StatefulWidget {
       _ExpansionBoardAndButtonsState();
 }
 
-class _ExpansionBoardAndButtonsState extends State<ExpansionBoardAndButtons> {
+class _ExpansionBoardAndButtonsState extends State<ExpansionBoardAndButtons>
+    with AutomaticKeepAliveClientMixin<ExpansionBoardAndButtons> {
   List<String> boardResources = [
     'Wood',
     'Wood',
@@ -85,11 +85,12 @@ class _ExpansionBoardAndButtonsState extends State<ExpansionBoardAndButtons> {
 
   @override
   Widget build(BuildContext context) {
-    var offSetX_1 = MediaQuery.of(context).size.width * 0.1765;
-    var offSetY_1 = MediaQuery.of(context).size.width * 0.08;
-    var fromOffSetY_1 = MediaQuery.of(context).size.width * 0.1118;
-    var tileWidth = MediaQuery.of(context).size.width * 0.129;
-    var tileHeight = 443 * tileWidth / 389;
+    super.build(context);
+    var offSetX_1 = MediaQuery.of(context).size.width * 0.1775;
+    var offSetY_1 = MediaQuery.of(context).size.width * 0.0775;
+    var fromOffSetY_1 = MediaQuery.of(context).size.width * 0.112;
+    var tileWidth = MediaQuery.of(context).size.width * 0.12895;
+    var tileHeight = 450 * tileWidth / 389;
 
     return Column(
       children: [
@@ -959,18 +960,7 @@ class _ExpansionBoardAndButtonsState extends State<ExpansionBoardAndButtons> {
           onPressed: () {
             HapticFeedback.mediumImpact();
             setState(() {
-              boardResources.shuffle();
-              // desertIndex = boardResources.indexOf('Desert');
-              desertIndex1 = boardResources.indexOf('Desert');
-              desertIndex2 = boardResources.lastIndexOf('Desert');
-              boardNumbers.shuffle();
-              boardNumbers[boardNumbers.indexOf('d')] =
-                  boardNumbers[desertIndex1];
-              boardNumbers[boardNumbers.lastIndexOf('d')] =
-                  boardNumbers[desertIndex2];
-              boardNumbers[desertIndex1] = 'd';
-              boardNumbers[desertIndex2] = 'd';
-              upsideDownOrNot.shuffle();
+              randomize();
             });
           },
         ),
@@ -994,25 +984,14 @@ class _ExpansionBoardAndButtonsState extends State<ExpansionBoardAndButtons> {
           onPressed: () async {
             HapticFeedback.mediumImpact();
             disableButton = true;
-            for (var i = 0; i < 15; i++) {
+            for (var i = 0; i < 20; i++) {
               await Future.delayed(
                 const Duration(milliseconds: 40),
                 () {
                   setState(
                     () {
-                      sleep(Duration(milliseconds: 20));
-                      boardResources.shuffle();
-                      // desertIndex = boardResources.indexOf('Desert');
-                      desertIndex1 = boardResources.indexOf('Desert');
-                      desertIndex2 = boardResources.lastIndexOf('Desert');
-                      boardNumbers.shuffle();
-                      boardNumbers[boardNumbers.indexOf('d')] =
-                          boardNumbers[desertIndex1];
-                      boardNumbers[boardNumbers.lastIndexOf('d')] =
-                          boardNumbers[desertIndex2];
-                      boardNumbers[desertIndex1] = 'd';
-                      boardNumbers[desertIndex2] = 'd';
-                      upsideDownOrNot.shuffle();
+                      // randomizeEvenly();
+                      randomize();
                     },
                   );
                 },
@@ -1024,4 +1003,92 @@ class _ExpansionBoardAndButtonsState extends State<ExpansionBoardAndButtons> {
       ],
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
+
+  // old (and not working) randomize:
+  // void randomize() {
+  //   boardResources.shuffle();
+  //   desertIndex1 = boardResources.indexOf('Desert');
+  //   desertIndex2 = boardResources.lastIndexOf('Desert');
+  //   boardNumbers.shuffle();
+  //   boardNumbers[boardNumbers.indexOf('d')] = boardNumbers[desertIndex1];
+  //   boardNumbers[boardNumbers.lastIndexOf('d')] = boardNumbers[desertIndex2];
+  //   boardNumbers[desertIndex1] = 'd';
+  //   boardNumbers[desertIndex2] = 'd';
+  //   upsideDownOrNot.shuffle();
+  // }
+
+  void randomize() {
+    boardResources.shuffle();
+    desertIndex1 = boardResources.indexOf('Desert');
+    desertIndex2 = boardResources.lastIndexOf('Desert');
+
+    // Create a new list of numbers without 'd'
+    List<String> tempBoardNumbers = List.from(boardNumbers)
+      ..removeWhere((number) => number == 'd');
+
+    // Shuffle the list of numbers
+    tempBoardNumbers.shuffle();
+
+    // Insert 'd' at the desert positions
+    tempBoardNumbers.insert(desertIndex1, 'd');
+    tempBoardNumbers.insert(desertIndex2, 'd');
+
+    // Replace the original boardNumbers with the newly arranged numbers
+    boardNumbers = tempBoardNumbers;
+
+    upsideDownOrNot.shuffle();
+  }
+
+  // EXPERIMENTAL - start
+  void randomizeEvenly() {
+    Map<String, int> resourceCount = {};
+    for (var resource in boardResources) {
+      resourceCount[resource] = (resourceCount[resource] ?? 0) + 1;
+    }
+
+    List<List<String>> chunks = [];
+    resourceCount.forEach((resource, count) {
+      while (count > 0) {
+        int take = math.min(2, count); // Take up to 2 of the same resource
+        chunks.add(List.filled(take, resource));
+        count -= take;
+      }
+    });
+
+    // Shuffle the chunks
+    chunks.shuffle();
+
+    // Merge chunks into a single list while ensuring the constraint
+    List<String> shuffledResources = [];
+    for (int i = 0; i < chunks.length; i++) {
+      shuffledResources.addAll(chunks[i]);
+      if (i < chunks.length - 1 && chunks[i].last == chunks[i + 1].first) {
+        // Swap the next chunk with a suitable one
+        int swapIndex = findSwapIndex(chunks, i);
+        if (swapIndex != -1) {
+          var temp = chunks[i + 1];
+          chunks[i + 1] = chunks[swapIndex];
+          chunks[swapIndex] = temp;
+        }
+      }
+    }
+
+    boardResources = shuffledResources;
+    // Shuffle numbers and orientation
+    randomize();
+  }
+
+  int findSwapIndex(List<List<String>> chunks, int currentIndex) {
+    String currentEnd = chunks[currentIndex].last;
+    for (int i = currentIndex + 2; i < chunks.length; i++) {
+      if (chunks[i].first != currentEnd) {
+        return i;
+      }
+    }
+    return -1; // No suitable swap found
+  }
+  // EXPERIMENTAL - end
 }
