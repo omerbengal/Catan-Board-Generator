@@ -1,7 +1,6 @@
 import 'individualBar.dart';
 
 class BarData {
-  final int oneAmount;
   final int twoAmount;
   final int threeAmount;
   final int fourAmount;
@@ -15,7 +14,6 @@ class BarData {
   final int twelveAmount;
 
   BarData({
-    required this.oneAmount,
     required this.twoAmount,
     required this.threeAmount,
     required this.fourAmount,
@@ -34,7 +32,6 @@ class BarData {
   // intialize the barData
   void intializeBarData() {
     barData = [
-      IndividualBar(x: 1, y: oneAmount),
       IndividualBar(x: 2, y: twoAmount),
       IndividualBar(x: 3, y: threeAmount),
       IndividualBar(x: 4, y: fourAmount),

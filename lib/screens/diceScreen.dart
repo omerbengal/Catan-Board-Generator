@@ -11,7 +11,6 @@ class DiceScreen extends StatefulWidget {
 
 class _DiceScreenState extends State<DiceScreen> {
   List<int> numberCounter = [
-    4,
     10,
     3,
     8,

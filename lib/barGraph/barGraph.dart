@@ -9,18 +9,17 @@ class MyBarGraph extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     BarData myBarData = BarData(
-      oneAmount: numberCounter[0],
-      twoAmount: numberCounter[1],
-      threeAmount: numberCounter[2],
-      fourAmount: numberCounter[3],
-      fiveAmount: numberCounter[4],
-      sixAmount: numberCounter[5],
-      sevenAmount: numberCounter[6],
-      eightAmount: numberCounter[7],
-      nineAmount: numberCounter[8],
-      tenAmount: numberCounter[9],
-      elevenAmount: numberCounter[10],
-      twelveAmount: numberCounter[11],
+      twoAmount: numberCounter[0],
+      threeAmount: numberCounter[1],
+      fourAmount: numberCounter[2],
+      fiveAmount: numberCounter[3],
+      sixAmount: numberCounter[4],
+      sevenAmount: numberCounter[5],
+      eightAmount: numberCounter[6],
+      nineAmount: numberCounter[7],
+      tenAmount: numberCounter[8],
+      elevenAmount: numberCounter[9],
+      twelveAmount: numberCounter[10],
     );
     myBarData.intializeBarData();
 
