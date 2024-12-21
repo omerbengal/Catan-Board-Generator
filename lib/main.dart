@@ -1,9 +1,9 @@
+import 'package:catan_board_generator/screens/mainScreen.dart';
 import 'package:flutter/material.dart';
-import 'finalGeneratedBoard.dart';
 
 void main() {
   runApp(new MaterialApp(
-    home: FinalGeneratedBoard(),
+    home: MainScreen(),
     debugShowCheckedModeBanner: false,
   ));
 }
