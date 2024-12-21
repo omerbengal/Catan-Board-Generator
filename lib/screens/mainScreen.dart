@@ -1,6 +1,6 @@
 import 'package:catan_board_generator/screens/diceScreen.dart';
-import 'package:catan_board_generator/widgets/expansionBoardAndButtons.dart';
-import 'package:catan_board_generator/widgets/regularBoardAndButtons.dart';
+import 'package:catan_board_generator/widgets/expansionBoardScreen.dart';
+import 'package:catan_board_generator/widgets/regularBoardScreen.dart';
 import 'package:flutter/material.dart';
 
 class MainScreen extends StatefulWidget {
