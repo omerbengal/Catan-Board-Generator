@@ -4,15 +4,15 @@ import 'package:flutter/services.dart';
 import 'dart:math' as math;
 import 'package:animated_button/animated_button.dart';
 
-class RegularBoardAndButtons extends StatefulWidget {
-  const RegularBoardAndButtons({Key? key}) : super(key: key);
+class RegularBoardScreen extends StatefulWidget {
+  const RegularBoardScreen({Key? key}) : super(key: key);
 
   @override
-  State<RegularBoardAndButtons> createState() => _RegularBoardAndButtonsState();
+  State<RegularBoardScreen> createState() => _RegularBoardScreenState();
 }
 
-class _RegularBoardAndButtonsState extends State<RegularBoardAndButtons>
-    with AutomaticKeepAliveClientMixin<RegularBoardAndButtons> {
+class _RegularBoardScreenState extends State<RegularBoardScreen>
+    with AutomaticKeepAliveClientMixin<RegularBoardScreen> {
   List<String> boardResources = [
     'Wood',
     'Wood',

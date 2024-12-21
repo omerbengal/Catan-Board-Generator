@@ -4,16 +4,15 @@ import 'package:flutter/services.dart';
 import 'dart:math' as math;
 import 'package:animated_button/animated_button.dart';
 
-class ExpansionBoardAndButtons extends StatefulWidget {
-  const ExpansionBoardAndButtons({Key? key}) : super(key: key);
+class ExpansionBoardScreen extends StatefulWidget {
+  const ExpansionBoardScreen({Key? key}) : super(key: key);
 
   @override
-  State<ExpansionBoardAndButtons> createState() =>
-      _ExpansionBoardAndButtonsState();
+  State<ExpansionBoardScreen> createState() => _ExpansionBoardScreenState();
 }
 
-class _ExpansionBoardAndButtonsState extends State<ExpansionBoardAndButtons>
-    with AutomaticKeepAliveClientMixin<ExpansionBoardAndButtons> {
+class _ExpansionBoardScreenState extends State<ExpansionBoardScreen>
+    with AutomaticKeepAliveClientMixin<ExpansionBoardScreen> {
   List<String> boardResources = [
     'Wood',
     'Wood',
