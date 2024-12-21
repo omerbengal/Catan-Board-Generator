@@ -1,4 +1,5 @@
-import 'package:catan_board_generator/screens/diceScreen.dart';
+// import 'package:catan_board_generator/screens/diceScreen.dart';
+import 'package:catan_board_generator/screens/dice_screen.dart';
 import 'package:catan_board_generator/widgets/expansionBoardScreen.dart';
 import 'package:catan_board_generator/widgets/regularBoardScreen.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _pages = [
     RegularBoardScreen(),
     ExpansionBoardScreen(),
+    // DiceScreen(),
     DiceScreen(),
   ];
   // Holds the colors of the bottom navigation bar based on the order of the pages
@@ -113,7 +115,7 @@ class _MainScreenState extends State<MainScreen> {
             ),
             IconButton(
               icon: Image.asset(
-                'assets/new/dice.png',
+                'assets/new/diceIcon.png',
                 width: MediaQuery.of(context).size.width * 0.13,
                 color: _currentPageIndex == 2
                     ? Colors.black
