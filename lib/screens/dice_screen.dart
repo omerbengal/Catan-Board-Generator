@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../widgets/session_buttons.dart';
 import '../widgets/dice_section.dart';
 import '../widgets/stats_section.dart';
+import '../services/firebase_service.dart';
+import 'dart:math';
 
 class DiceScreen extends StatefulWidget {
   const DiceScreen({Key? key}) : super(key: key);
@@ -47,9 +49,9 @@ class _DiceScreenState extends State<DiceScreen> {
   }
 
   void _handleCreateSession() async {
-    // TODO: Implement Firebase connection to generate unique code
+    String? newSessionCode = await FirebaseService().createSession();
     setState(() {
-      sessionCode = 'GENERATED_CODE'; // Replace with actual generated code
+      sessionCode = newSessionCode;
     });
   }
 
@@ -58,17 +60,30 @@ class _DiceScreenState extends State<DiceScreen> {
       context: context,
       builder: (context) => JoinSessionDialog(
         onJoin: (code, name) {
-          setState(() {
-            sessionCode = code;
-            playerName = name;
+          FirebaseService().checkIfSessionExists(code).then((exists) {
+            if (exists) {
+              setState(() {
+                sessionCode = code;
+                playerName = name;
+              });
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Session does not exist'),
+                ),
+              );
+            }
           });
         },
       ),
     );
   }
 
-  void _handleDiceRoll() {
-    // TODO: Implement dice roll logic and Firebase update
-    print('Dice rolled!');
+  void _handleDiceRoll() async {
+    print('Rolling dice, with session code: $sessionCode');
+    final random = Random();
+    final roll = random.nextInt(6) + random.nextInt(6) + 2;
+    print('Rolled: $roll');
+    await FirebaseService().updateRoll(sessionCode!, roll);
   }
 }
