@@ -1,4 +1,5 @@
 import 'package:catan_board_generator/widgets/join_session_dialog.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import '../widgets/session_buttons.dart';
 import '../widgets/dice_section.dart';
@@ -17,35 +18,80 @@ class _DiceScreenState extends State<DiceScreen> {
   String? sessionCode;
   String? playerName;
   int currentPage = 0;
+  bool isLoading = false;
+  bool hasCheckedSession = false; // New flag to track session checking
 
   @override
   Widget build(BuildContext context) {
+    print("session code $sessionCode");
     return Scaffold(
-      body: PageView(
-        scrollDirection: Axis.vertical,
-        onPageChanged: (index) {
-          setState(() {
-            currentPage = index;
-          });
-        },
-        children: [
-          if (sessionCode == null)
-            SessionButtons(
+      body: sessionCode == null
+          ? SessionButtons(
               onCreateSession: _handleCreateSession,
               onJoinSession: _handleJoinSession,
             )
-          else
-            DiceSection(
-              sessionCode: sessionCode!,
-              onRollDice: _handleDiceRoll,
+          : StreamBuilder<DatabaseEvent>(
+              stream: FirebaseDatabase.instance
+                  .ref()
+                  .child('sessions')
+                  .child(sessionCode!)
+                  .onValue,
+              builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      'An error occurred. Please try again.',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  );
+                }
+
+                if (!snapshot.hasData ||
+                    snapshot.data?.snapshot.value == null) {
+                  // Avoid calling setState during build
+                  if (!hasCheckedSession) {
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      _startLoading();
+                    });
+                  }
+                  return Center(
+                    child: Text('Loading session... Please wait.'),
+                  );
+                }
+
+                return PageView(
+                  scrollDirection: Axis.vertical,
+                  onPageChanged: (index) {
+                    setState(() {
+                      currentPage = index;
+                    });
+                  },
+                  children: [
+                    DiceSection(
+                      sessionCode: sessionCode!,
+                      onRollDice: _handleDiceRoll,
+                    ),
+                    StatsSection(sessionCode: sessionCode!),
+                  ],
+                );
+              },
             ),
-          if (sessionCode != null)
-            StatsSection(sessionCode: sessionCode!)
-          else
-            Container(), // Empty container as placeholder when session is null
-        ],
-      ),
     );
+  }
+
+  void _startLoading() {
+    setState(() {
+      isLoading = true;
+      hasCheckedSession = true; // Update the flag to avoid repeated calls
+    });
+
+    Future.delayed(Duration(seconds: 1), () {
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
+    });
   }
 
   void _handleCreateSession() async {
