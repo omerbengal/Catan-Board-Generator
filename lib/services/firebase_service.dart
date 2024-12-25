@@ -62,8 +62,10 @@ class FirebaseService {
           _database.child('sessions').child(sessionCode).child('rolls');
       DataSnapshot snapshot = await ref.get();
       if (snapshot.exists) {
-        List<dynamic> rolls = snapshot.value as List<dynamic>;
-        rolls[rollValue - 2] = rolls[rollValue - 2] + 1;
+        Map<Object?, Object?> snapshotMap =
+            snapshot.value as Map<Object?, Object?>;
+        List<dynamic> rolls = snapshotMap['rolls'] as List<dynamic>;
+        rolls[rollValue] = rolls[rollValue] + 1;
         await ref.set(rolls);
       }
     } catch (e) {
@@ -98,7 +100,19 @@ class FirebaseService {
     try {
       DatabaseReference newSessionRef = _database.child('sessions').push();
       await newSessionRef.set({
-        'rolls': [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        'rolls': {
+          "2": 0,
+          "3": 0,
+          "4": 0,
+          "5": 0,
+          "6": 0,
+          "7": 0,
+          "8": 0,
+          "9": 0,
+          "10": 0,
+          "11": 0,
+          "12": 0,
+        },
       });
       return newSessionRef.key;
     } catch (e) {

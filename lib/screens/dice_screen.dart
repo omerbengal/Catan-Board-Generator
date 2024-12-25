@@ -34,7 +34,7 @@ class _DiceScreenState extends State<DiceScreen> {
               stream: FirebaseDatabase.instance
                   .ref()
                   .child('sessions')
-                  .child(sessionCode!)
+                  .child(sessionCode ?? '')
                   .onValue,
               builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
                 if (snapshot.hasError) {
@@ -48,14 +48,9 @@ class _DiceScreenState extends State<DiceScreen> {
 
                 if (!snapshot.hasData ||
                     snapshot.data?.snapshot.value == null) {
-                  // Avoid calling setState during build
-                  if (!hasCheckedSession) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      _startLoading();
-                    });
-                  }
-                  return Center(
-                    child: Text('Loading session... Please wait.'),
+                  return SessionButtons(
+                    onCreateSession: _handleCreateSession,
+                    onJoinSession: _handleJoinSession,
                   );
                 }
 
@@ -77,21 +72,6 @@ class _DiceScreenState extends State<DiceScreen> {
               },
             ),
     );
-  }
-
-  void _startLoading() {
-    setState(() {
-      isLoading = true;
-      hasCheckedSession = true; // Update the flag to avoid repeated calls
-    });
-
-    Future.delayed(Duration(seconds: 1), () {
-      if (mounted) {
-        setState(() {
-          isLoading = false;
-        });
-      }
-    });
   }
 
   void _handleCreateSession() async {
@@ -125,11 +105,12 @@ class _DiceScreenState extends State<DiceScreen> {
     );
   }
 
-  void _handleDiceRoll() async {
-    print('Rolling dice, with session code: $sessionCode');
+  Future<List<int>> _handleDiceRoll() async {
     final random = Random();
-    final roll = random.nextInt(6) + random.nextInt(6) + 2;
-    print('Rolled: $roll');
-    await FirebaseService().updateRoll(sessionCode!, roll);
+    final roll1 = random.nextInt(6) + 1;
+    final roll2 = random.nextInt(6) + 1;
+    await FirebaseService().updateRoll(sessionCode!, roll1 + roll2);
+    // return together roll1 and roll2 but separated
+    return [roll1, roll2];
   }
 }
