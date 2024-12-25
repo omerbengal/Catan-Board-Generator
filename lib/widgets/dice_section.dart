@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:share_plus/share_plus.dart';
 
 class DiceSection extends StatefulWidget {
   final String sessionCode;
@@ -23,15 +24,22 @@ class _DiceSectionState extends State<DiceSection> {
   @override
   Widget build(BuildContext context) {
     return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Text(
-            'Session Code: ${widget.sessionCode}',
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
+          child: GestureDetector(
+            onTap: () {
+              Share.share(widget.sessionCode);
+            },
+            child: Text(
+              "Session Code:\n${widget.sessionCode}",
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+              textAlign: TextAlign.center,
             ),
           ),
         ),
@@ -45,12 +53,12 @@ class _DiceSectionState extends State<DiceSection> {
               //     lastRoll2 = value[1];
               //   });
               // });
-              for (var i = 1; i <= 10; i++) {
+              for (var i = 1; i <= 5; i++) {
                 await Future.delayed(
-                  const Duration(milliseconds: 100),
+                  const Duration(milliseconds: 75),
                   () async {
                     List<int> rolls;
-                    if (i < 10) {
+                    if (i < 5) {
                       rolls = await widget.onRollDice(false);
                     } else {
                       rolls = await widget.onRollDice(true);

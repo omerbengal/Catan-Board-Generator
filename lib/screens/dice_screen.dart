@@ -23,7 +23,6 @@ class _DiceScreenState extends State<DiceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("session code $sessionCode");
     return Scaffold(
       body: sessionCode == null
           ? SessionButtons(
