@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class DiceSection extends StatefulWidget {
   final String sessionCode;
   // Add onRollDice callback, which is a function that returns a Future<int>
-  final Future<List<int>> Function() onRollDice;
+  final Future<List<int>> Function(bool updateFireBase) onRollDice;
 
   const DiceSection({
     Key? key,
@@ -36,13 +37,33 @@ class _DiceSectionState extends State<DiceSection> {
         ),
         Expanded(
           child: GestureDetector(
-            onTap: () {
-              widget.onRollDice().then((value) {
-                setState(() {
-                  lastRoll1 = value[0];
-                  lastRoll2 = value[1];
-                });
-              });
+            onTap: () async {
+              HapticFeedback.mediumImpact();
+              // widget.onRollDice().then((value) {
+              //   setState(() {
+              //     lastRoll1 = value[0];
+              //     lastRoll2 = value[1];
+              //   });
+              // });
+              for (var i = 1; i <= 10; i++) {
+                await Future.delayed(
+                  const Duration(milliseconds: 100),
+                  () async {
+                    List<int> rolls;
+                    if (i < 10) {
+                      rolls = await widget.onRollDice(false);
+                    } else {
+                      rolls = await widget.onRollDice(true);
+                    }
+                    setState(
+                      () {
+                        lastRoll1 = rolls[0];
+                        lastRoll2 = rolls[1];
+                      },
+                    );
+                  },
+                );
+              }
             },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,

@@ -105,11 +105,13 @@ class _DiceScreenState extends State<DiceScreen> {
     );
   }
 
-  Future<List<int>> _handleDiceRoll() async {
+  Future<List<int>> _handleDiceRoll(bool updateFireBase) async {
     final random = Random();
     final roll1 = random.nextInt(6) + 1;
     final roll2 = random.nextInt(6) + 1;
-    await FirebaseService().updateRoll(sessionCode!, roll1 + roll2);
+    if (updateFireBase) {
+      await FirebaseService().updateRoll(sessionCode!, roll1 + roll2);
+    }
     return [roll1, roll2];
   }
 }
