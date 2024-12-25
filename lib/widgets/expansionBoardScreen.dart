@@ -944,7 +944,7 @@ class _ExpansionBoardScreenState extends State<ExpansionBoardScreen>
           height: MediaQuery.of(context).size.height * 0.04,
         ),
         AnimatedButton(
-          enabled: disableButton ? false : true,
+          enabled: !disableButton,
           height: tileHeight,
           width: tileWidth * 3.7,
           color: Colors.green[200] ?? Colors.green,
@@ -967,7 +967,7 @@ class _ExpansionBoardScreenState extends State<ExpansionBoardScreen>
           height: MediaQuery.of(context).size.height * 0.04,
         ),
         AnimatedButton(
-          enabled: disableButton ? false : true,
+          enabled: !disableButton,
           height: tileHeight,
           width: tileWidth * 5.5,
           color: Colors.green[200] ?? Colors.green,
@@ -982,21 +982,24 @@ class _ExpansionBoardScreenState extends State<ExpansionBoardScreen>
           ),
           onPressed: () async {
             HapticFeedback.mediumImpact();
-            disableButton = true;
-            for (var i = 0; i < 20; i++) {
+            for (var i = 1; i <= 20; i++) {
               await Future.delayed(
                 const Duration(milliseconds: 40),
                 () {
                   setState(
                     () {
-                      // randomizeEvenly();
+                      if (i == 1) {
+                        disableButton = true;
+                      }
                       randomize();
+                      if (i == 20) {
+                        disableButton = false;
+                      }
                     },
                   );
                 },
               );
             }
-            disableButton = false;
           },
         ),
       ],
