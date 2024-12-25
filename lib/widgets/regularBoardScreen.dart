@@ -625,7 +625,7 @@ class _RegularBoardScreenState extends State<RegularBoardScreen>
           height: MediaQuery.of(context).size.height * 0.04,
         ),
         AnimatedButton(
-          enabled: disableButton ? false : true,
+          enabled: !disableButton,
           height: tileHeight,
           width: tileWidth * 3.7,
           color: Colors.green[200] ?? Colors.green,
@@ -640,13 +640,7 @@ class _RegularBoardScreenState extends State<RegularBoardScreen>
           onPressed: () {
             HapticFeedback.mediumImpact();
             setState(() {
-              boardResources.shuffle();
-              desertIndex = boardResources.indexOf('Desert');
-              boardNumbers.shuffle();
-              boardNumbers[boardNumbers.indexOf('d')] =
-                  boardNumbers[desertIndex];
-              boardNumbers[desertIndex] = 'd';
-              upsideDownOrNot.shuffle();
+              randomize();
             });
           },
         ),
@@ -654,7 +648,7 @@ class _RegularBoardScreenState extends State<RegularBoardScreen>
           height: MediaQuery.of(context).size.height * 0.04,
         ),
         AnimatedButton(
-          enabled: disableButton ? false : true,
+          enabled: !disableButton,
           height: tileHeight,
           width: tileWidth * 5.5,
           color: Colors.green[200] ?? Colors.green,
@@ -669,30 +663,37 @@ class _RegularBoardScreenState extends State<RegularBoardScreen>
           ),
           onPressed: () async {
             HapticFeedback.mediumImpact();
-            disableButton = true;
-            for (var i = 0; i < 20; i++) {
+            for (var i = 1; i <= 20; i++) {
               await Future.delayed(
                 const Duration(milliseconds: 40),
                 () {
                   setState(
                     () {
-                      boardResources.shuffle();
-                      desertIndex = boardResources.indexOf('Desert');
-                      boardNumbers.shuffle();
-                      boardNumbers[boardNumbers.indexOf('d')] =
-                          boardNumbers[desertIndex];
-                      boardNumbers[desertIndex] = 'd';
-                      upsideDownOrNot.shuffle();
+                      if (i == 1) {
+                        disableButton = true;
+                      }
+                      randomize();
+                      if (i == 20) {
+                        disableButton = false;
+                      }
                     },
                   );
                 },
               );
             }
-            disableButton = false;
           },
         ),
       ],
     );
+  }
+
+  void randomize() {
+    boardResources.shuffle();
+    desertIndex = boardResources.indexOf('Desert');
+    boardNumbers.shuffle();
+    boardNumbers[boardNumbers.indexOf('d')] = boardNumbers[desertIndex];
+    boardNumbers[desertIndex] = 'd';
+    upsideDownOrNot.shuffle();
   }
 
   @override
