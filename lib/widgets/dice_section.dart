@@ -21,8 +21,6 @@ class _DiceSectionState extends State<DiceSection> {
 
   @override
   Widget build(BuildContext context) {
-    print("lastRoll1: " + lastRoll1.toString());
-    print("lastRoll2: " + lastRoll2.toString());
     return Column(
       children: [
         Padding(
@@ -50,10 +48,10 @@ class _DiceSectionState extends State<DiceSection> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image.asset('assets/new/dice' + lastRoll1.toString() + '.png',
-                    width: 100), // Add dice image asset
+                    width: 150),
                 const SizedBox(width: 20),
-                Image.asset('assets/new/dice' + lastRoll1.toString() + '.png',
-                    width: 100), // Add dice image asset
+                Image.asset('assets/new/dice' + lastRoll2.toString() + '.png',
+                    width: 150),
               ],
             ),
           ),
