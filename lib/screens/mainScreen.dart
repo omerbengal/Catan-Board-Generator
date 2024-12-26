@@ -12,7 +12,7 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen>
-    with AutomaticKeepAliveClientMixin {
+    with AutomaticKeepAliveClientMixin<MainScreen> {
   // Holds the index of the current page
   int _currentPageIndex = 0;
   // Controls the page view widget

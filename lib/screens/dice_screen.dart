@@ -14,7 +14,8 @@ class DiceScreen extends StatefulWidget {
   _DiceScreenState createState() => _DiceScreenState();
 }
 
-class _DiceScreenState extends State<DiceScreen> {
+class _DiceScreenState extends State<DiceScreen>
+    with AutomaticKeepAliveClientMixin<DiceScreen> {
   String? sessionCode;
   String? playerName;
   int currentPage = 0;
@@ -22,7 +23,11 @@ class _DiceScreenState extends State<DiceScreen> {
   bool hasCheckedSession = false; // New flag to track session checking
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       body: sessionCode == null
           ? SessionButtons(
