@@ -83,8 +83,8 @@ class FirebaseService {
           "11": 0,
           "12": 0,
         },
-        'last_roll1': 0,
-        'last_roll2': 0,
+        'last_roll1': 1,
+        'last_roll2': 1,
       });
       return newSessionRef.key;
     } catch (e) {

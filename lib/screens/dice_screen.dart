@@ -64,6 +64,10 @@ class _DiceScreenState extends State<DiceScreen> {
                     DiceSection(
                       sessionCode: sessionCode!,
                       onRollDice: _handleDiceRoll,
+                      last_roll1: (snapshot.data?.snapshot.value
+                          as Map?)?['last_roll1'],
+                      last_roll2: (snapshot.data?.snapshot.value
+                          as Map?)?['last_roll2'],
                     ),
                     StatsSection(sessionCode: sessionCode!),
                   ],
