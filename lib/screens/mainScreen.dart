@@ -11,7 +11,8 @@ class MainScreen extends StatefulWidget {
   State<MainScreen> createState() => _MainScreenState();
 }
 
-class _MainScreenState extends State<MainScreen> {
+class _MainScreenState extends State<MainScreen>
+    with AutomaticKeepAliveClientMixin {
   // Holds the index of the current page
   int _currentPageIndex = 0;
   // Controls the page view widget
@@ -41,7 +42,11 @@ class _MainScreenState extends State<MainScreen> {
   }
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       backgroundColor: Colors.teal[100],
       appBar: AppBar(
