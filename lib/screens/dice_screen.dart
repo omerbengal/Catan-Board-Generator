@@ -109,7 +109,7 @@ class _DiceScreenState extends State<DiceScreen> {
     final roll1 = random.nextInt(6) + 1;
     final roll2 = random.nextInt(6) + 1;
     if (updateFireBase) {
-      await FirebaseService().updateRoll(sessionCode!, roll1 + roll2);
+      await FirebaseService().updateRoll(sessionCode!, roll1, roll2);
     }
     return [roll1, roll2];
   }

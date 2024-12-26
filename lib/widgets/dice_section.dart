@@ -20,6 +20,8 @@ class DiceSection extends StatefulWidget {
 class _DiceSectionState extends State<DiceSection> {
   int? lastRoll1 = 1;
   int? lastRoll2 = 1;
+  bool _isRolling = false;
+  int _numOfFakeRolls = 1;
 
   @override
   Widget build(BuildContext context) {
@@ -44,35 +46,45 @@ class _DiceSectionState extends State<DiceSection> {
           ),
         ),
         Expanded(
+          //! desable button when dice is rolling
           child: GestureDetector(
-            onTap: () async {
-              HapticFeedback.mediumImpact();
-              // widget.onRollDice().then((value) {
-              //   setState(() {
-              //     lastRoll1 = value[0];
-              //     lastRoll2 = value[1];
-              //   });
-              // });
-              for (var i = 1; i <= 5; i++) {
-                await Future.delayed(
-                  const Duration(milliseconds: 75),
-                  () async {
-                    List<int> rolls;
-                    if (i < 5) {
-                      rolls = await widget.onRollDice(false);
-                    } else {
-                      rolls = await widget.onRollDice(true);
+            onTap: _isRolling
+                ? null
+                : () async {
+                    setState(() {
+                      _isRolling = true;
+                    });
+
+                    HapticFeedback.mediumImpact();
+                    // widget.onRollDice().then((value) {
+                    //   setState(() {
+                    //     lastRoll1 = value[0];
+                    //     lastRoll2 = value[1];
+                    //   });
+                    // });
+                    for (var i = 1; i <= _numOfFakeRolls; i++) {
+                      await Future.delayed(
+                        const Duration(milliseconds: 75),
+                        () async {
+                          List<int> rolls;
+                          if (i < _numOfFakeRolls) {
+                            rolls = await widget.onRollDice(false);
+                          } else {
+                            rolls = await widget.onRollDice(true);
+                          }
+                          setState(
+                            () {
+                              lastRoll1 = rolls[0];
+                              lastRoll2 = rolls[1];
+                              if (i == _numOfFakeRolls) {
+                                _isRolling = false;
+                              }
+                            },
+                          );
+                        },
+                      );
                     }
-                    setState(
-                      () {
-                        lastRoll1 = rolls[0];
-                        lastRoll2 = rolls[1];
-                      },
-                    );
                   },
-                );
-              }
-            },
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

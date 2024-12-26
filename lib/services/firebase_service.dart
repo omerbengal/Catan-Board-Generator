@@ -10,48 +10,56 @@ class FirebaseService {
     _database = FirebaseDatabase.instance.ref();
   }
 
-  Future<Map<String, dynamic>?> getSessionRolls(String sessionCode) async {
-    try {
-      DataSnapshot snapshot =
-          await _database.child('sessions/$sessionCode').get();
-      return snapshot.value as Map<String, dynamic>?;
-    } catch (e) {
-      print('Error getting session rolls: $e');
-      return null;
-    }
-  }
+  // Future<Map<String, dynamic>?> getSessionRolls(String sessionCode) async {
+  //   try {
+  //     DataSnapshot snapshot =
+  //         await _database.child('sessions/$sessionCode').get();
+  //     return snapshot.value as Map<String, dynamic>?;
+  //   } catch (e) {
+  //     print('Error getting session rolls: $e');
+  //     return null;
+  //   }
+  // }
 
-  Future<void> updateRoll(String sessionCode, int rollValue) async {
+  Future<void> updateRoll(
+      String sessionCode, int roll1Value, int roll2Value) async {
+    int rollValue = roll1Value + roll2Value;
     try {
-      DatabaseReference ref =
-          _database.child('sessions').child(sessionCode).child('rolls');
+      DatabaseReference ref = _database.child('sessions').child(sessionCode);
       DataSnapshot snapshot = await ref.get();
       if (snapshot.exists) {
-        List<dynamic> rolls;
-        if (snapshot.value is List<dynamic>) {
-          rolls = snapshot.value as List<dynamic>;
-        } else {
-          Map<Object?, Object?> snapshotMap =
-              snapshot.value as Map<Object?, Object?>;
-          rolls = snapshotMap['rolls'] as List<dynamic>;
-        }
+        Map<Object?, Object?> snapshotMap =
+            snapshot.value as Map<Object?, Object?>;
+        List<dynamic> rolls = snapshotMap['rolls'] as List<dynamic>;
+        // List<dynamic> rolls;
+        // if (snapshot.value is List<dynamic>) {
+        //   rolls = snapshot.value as List<dynamic>;
+        // } else {
+        //   Map<Object?, Object?> snapshotMap =
+        //       snapshot.value as Map<Object?, Object?>;
+        //   rolls = snapshotMap['rolls'] as List<dynamic>;
+        // }
         // chop off the first 2 elements, which are null
         rolls = rolls.sublist(2);
         rolls[rollValue - 2] = rolls[rollValue - 2] + 1;
-        Map<String, dynamic> newRolls = {
-          "2": rolls[0],
-          "3": rolls[1],
-          "4": rolls[2],
-          "5": rolls[3],
-          "6": rolls[4],
-          "7": rolls[5],
-          "8": rolls[6],
-          "9": rolls[7],
-          "10": rolls[8],
-          "11": rolls[9],
-          "12": rolls[10],
+        Map<String, dynamic> newMap = {
+          'rolls': {
+            "2": rolls[0],
+            "3": rolls[1],
+            "4": rolls[2],
+            "5": rolls[3],
+            "6": rolls[4],
+            "7": rolls[5],
+            "8": rolls[6],
+            "9": rolls[7],
+            "10": rolls[8],
+            "11": rolls[9],
+            "12": rolls[10],
+          },
+          'last_roll1': roll1Value,
+          'last_roll2': roll2Value,
         };
-        await ref.set(newRolls);
+        await ref.set(newMap);
       }
     } catch (e) {
       print('Error updating roll: $e');
@@ -75,6 +83,8 @@ class FirebaseService {
           "11": 0,
           "12": 0,
         },
+        'last_roll1': 0,
+        'last_roll2': 0,
       });
       return newSessionRef.key;
     } catch (e) {
