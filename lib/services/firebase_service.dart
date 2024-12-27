@@ -30,15 +30,9 @@ class FirebaseService {
       if (snapshot.exists) {
         Map<Object?, Object?> snapshotMap =
             snapshot.value as Map<Object?, Object?>;
+        Map<Object?, Object?> users =
+            snapshotMap['users'] as Map<Object?, Object?>;
         List<dynamic> rolls = snapshotMap['rolls'] as List<dynamic>;
-        // List<dynamic> rolls;
-        // if (snapshot.value is List<dynamic>) {
-        //   rolls = snapshot.value as List<dynamic>;
-        // } else {
-        //   Map<Object?, Object?> snapshotMap =
-        //       snapshot.value as Map<Object?, Object?>;
-        //   rolls = snapshotMap['rolls'] as List<dynamic>;
-        // }
         // chop off the first 2 elements, which are null
         rolls = rolls.sublist(2);
         rolls[rollValue - 2] = rolls[rollValue - 2] + 1;
@@ -56,8 +50,9 @@ class FirebaseService {
             "11": rolls[9],
             "12": rolls[10],
           },
-          'last_roll1': roll1Value,
-          'last_roll2': roll2Value,
+          "last_roll1": roll1Value,
+          "last_roll2": roll2Value,
+          "users": users,
         };
         await ref.set(newMap);
       }
@@ -66,7 +61,7 @@ class FirebaseService {
     }
   }
 
-  Future<String?> createSession() async {
+  Future<String?> createSession(String admin, String uid) async {
     try {
       DatabaseReference newSessionRef = _database.child('sessions').push();
       await newSessionRef.set({
@@ -83,14 +78,39 @@ class FirebaseService {
           "11": 0,
           "12": 0,
         },
-        'last_roll1': 1,
-        'last_roll2': 1,
+        "last_roll1": 1,
+        "last_roll2": 1,
+        "users": {
+          uid: {"name": admin, "isAdmin": true}
+        },
       });
       return newSessionRef.key;
     } catch (e) {
       print('Error creating session: $e');
       return null;
     }
+  }
+
+  Future<bool> joinSession(String sessionCode, String name, String uid) async {
+    try {
+      DatabaseReference ref =
+          _database.child('sessions').child(sessionCode).child('users');
+      DataSnapshot snapshot = await ref.get();
+      if (snapshot.exists) {
+        Map<Object?, Object?> users = snapshot.value as Map<Object?, Object?>;
+        if (users.containsKey(uid)) {
+          return true;
+        } else {
+          users[uid] = {"name": name, "isAdmin": false};
+          await ref.set(users);
+          return true;
+        }
+      }
+    } catch (e) {
+      print('Error joining session: $e');
+      rethrow;
+    }
+    return false;
   }
 
   Future<bool> checkIfSessionExists(String sessionCode) async {
