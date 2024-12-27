@@ -67,17 +67,20 @@ class _DiceScreenState extends State<DiceScreen>
                   },
                   children: [
                     DiceSection(
-                      sessionCode: sessionCode!,
-                      onRollDice: _handleDiceRoll,
-                      last_roll1: (snapshot.data?.snapshot.value
-                          as Map?)?['last_roll1'],
-                      last_roll2: (snapshot.data?.snapshot.value
-                          as Map?)?['last_roll2'],
-                      userName: (snapshot.data?.snapshot.value
-                          as Map?)?['users'][playerUid]['name'],
-                      isAdmin: (snapshot.data?.snapshot.value as Map?)?['users']
-                          [playerUid]['isAdmin'],
-                    ),
+                        sessionCode: sessionCode!,
+                        onRollDice: _handleDiceRoll,
+                        last_roll1: (snapshot.data?.snapshot.value
+                            as Map?)?['last_roll1'],
+                        last_roll2: (snapshot.data?.snapshot.value
+                            as Map?)?['last_roll2'],
+                        userName: (snapshot.data?.snapshot.value
+                            as Map?)?['users'][playerUid]['name'],
+                        isAdmin: (snapshot.data?.snapshot.value
+                            as Map?)?['users'][playerUid]['is_admin'],
+                        isTurn: (snapshot.data?.snapshot.value
+                                as Map?)?['users'][playerUid]['turn_number'] ==
+                            (snapshot.data?.snapshot.value
+                                as Map?)?['current_turn_number']),
                     StatsSection(sessionCode: sessionCode!),
                   ],
                 );
@@ -108,12 +111,6 @@ class _DiceScreenState extends State<DiceScreen>
       context: context,
       builder: (context) => JoinSessionDialog(
         onJoin: (code, name) async {
-          // FirebaseService().checkIfSessionExists(code).then((exists) {
-          //   if (exists) {
-          //     setState(() {
-          //       sessionCode = code;
-          //       playerUid = uid;
-          //     });
           await FirebaseService().joinSession(code, name, uid).then((joined) {
             if (joined) {
               setState(() {

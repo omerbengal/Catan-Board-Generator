@@ -1,3 +1,4 @@
+import 'package:catan_board_generator/services/firebase_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
@@ -10,6 +11,7 @@ class DiceSection extends StatefulWidget {
   final int last_roll2;
   final String userName;
   final bool isAdmin;
+  final bool isTurn;
 
   const DiceSection({
     Key? key,
@@ -19,6 +21,7 @@ class DiceSection extends StatefulWidget {
     required this.last_roll2,
     required this.userName,
     required this.isAdmin,
+    required this.isTurn,
   }) : super(key: key);
 
   @override
@@ -28,7 +31,6 @@ class DiceSection extends StatefulWidget {
 class _DiceSectionState extends State<DiceSection> {
   int? lastRoll1 = 1;
   int? lastRoll2 = 1;
-  bool _isRolling = false;
   int _numOfFakeRolls = 1;
 
   @override
@@ -61,33 +63,30 @@ class _DiceSectionState extends State<DiceSection> {
           ),
         ),
         GestureDetector(
-          onTap:
-              _isRolling // If the dice are rolling, do not allow another roll
-                  ? null
-                  : () async {
-                      setState(() {
-                        _isRolling = true;
-                      });
+          onTap: !widget.isTurn
+              ? null
+              : () async {
+                  int currentTurn = await FirebaseService()
+                      .blockCurrentTurnForASecond(widget.sessionCode);
+                  HapticFeedback.mediumImpact();
 
-                      HapticFeedback.mediumImpact();
-                      for (var i = 1; i <= _numOfFakeRolls; i++) {
-                        await Future.delayed(
-                          const Duration(milliseconds: 75),
-                          () async {
-                            if (i < _numOfFakeRolls) {
-                              await widget.onRollDice(false);
-                            } else {
-                              await widget.onRollDice(true);
-                            }
-                            if (i == _numOfFakeRolls) {
-                              setState(() {
-                                _isRolling = false;
-                              });
-                            }
-                          },
-                        );
-                      }
-                    },
+                  for (var i = 1; i <= _numOfFakeRolls; i++) {
+                    await Future.delayed(
+                      const Duration(milliseconds: 75),
+                      () async {
+                        if (i < _numOfFakeRolls) {
+                          await widget.onRollDice(false);
+                        } else {
+                          await widget.onRollDice(true);
+                        }
+                        if (i == _numOfFakeRolls) {
+                          await FirebaseService().increaseCurrentTurn(
+                              widget.sessionCode, currentTurn);
+                        }
+                      },
+                    );
+                  }
+                },
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [

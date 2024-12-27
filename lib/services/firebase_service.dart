@@ -36,7 +36,7 @@ class FirebaseService {
         // chop off the first 2 elements, which are null
         rolls = rolls.sublist(2);
         rolls[rollValue - 2] = rolls[rollValue - 2] + 1;
-        Map<String, dynamic> newMap = {
+        await ref.update({
           'rolls': {
             "2": rolls[0],
             "3": rolls[1],
@@ -52,9 +52,7 @@ class FirebaseService {
           },
           "last_roll1": roll1Value,
           "last_roll2": roll2Value,
-          "users": users,
-        };
-        await ref.set(newMap);
+        });
       }
     } catch (e) {
       print('Error updating roll: $e');
@@ -81,8 +79,9 @@ class FirebaseService {
         "last_roll1": 1,
         "last_roll2": 1,
         "users": {
-          uid: {"name": admin, "isAdmin": true}
+          uid: {"name": admin, "is_admin": true, "turn_number": 1},
         },
+        "current_turn_number": 1,
       });
       return newSessionRef.key;
     } catch (e) {
@@ -101,7 +100,18 @@ class FirebaseService {
         if (users.containsKey(uid)) {
           return true;
         } else {
-          users[uid] = {"name": name, "isAdmin": false};
+          int maxTurnNumber = 0;
+          for (var user in users.values) {
+            var userMap = user as Map<Object?, Object?>;
+            if (userMap['turn_number'] as int > maxTurnNumber) {
+              maxTurnNumber = userMap['turn_number'] as int;
+            }
+          }
+          users[uid] = {
+            "name": name,
+            "is_admin": false,
+            "turn_number": maxTurnNumber + 1
+          };
           await ref.set(users);
           return true;
         }
@@ -111,6 +121,41 @@ class FirebaseService {
       rethrow;
     }
     return false;
+  }
+
+  Future<int> blockCurrentTurnForASecond(String sessionCode) async {
+    try {
+      DatabaseReference ref = _database.child('sessions').child(sessionCode);
+      DataSnapshot snapshot = await ref.get();
+      if (snapshot.exists) {
+        Map<Object?, Object?> snapshotMap =
+            snapshot.value as Map<Object?, Object?>;
+        int currentTurnNumber = snapshotMap['current_turn_number'] as int;
+        await ref.update({'current_turn_number': -1});
+        return currentTurnNumber;
+      }
+    } catch (e) {
+      print('Error blocking current turn: $e');
+    }
+    return 0;
+  }
+
+  Future<void> increaseCurrentTurn(
+      String sessionCode, int turnBeforeBlocking) async {
+    try {
+      DatabaseReference ref = _database.child('sessions').child(sessionCode);
+      DataSnapshot snapshot = await ref.get();
+      if (snapshot.exists) {
+        Map<Object?, Object?> snapshotMap =
+            snapshot.value as Map<Object?, Object?>;
+        int numOfUsers = (snapshotMap['users'] as Map<Object?, Object?>).length;
+        int currentTurnNumber = turnBeforeBlocking;
+        int nextTurnNumber = (currentTurnNumber % numOfUsers) + 1;
+        await ref.update({'current_turn_number': nextTurnNumber});
+      }
+    } catch (e) {
+      print('Error updating current turn: $e');
+    }
   }
 
   Future<bool> checkIfSessionExists(String sessionCode) async {
