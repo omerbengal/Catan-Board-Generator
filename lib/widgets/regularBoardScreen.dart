@@ -60,6 +60,9 @@ class _RegularBoardScreenState extends State<RegularBoardScreen>
   var desertIndex;
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
     var offSetX_1 = MediaQuery.of(context).size.width * 0.1295;
@@ -695,7 +698,4 @@ class _RegularBoardScreenState extends State<RegularBoardScreen>
     boardNumbers[desertIndex] = 'd';
     upsideDownOrNot.shuffle();
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }
