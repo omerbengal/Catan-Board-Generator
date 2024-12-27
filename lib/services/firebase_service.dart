@@ -57,7 +57,7 @@ class FirebaseService {
     }
   }
 
-  Future<String?> createSession(String admin, String uid) async {
+  Future<String?> createSession(String admin_name, String uid) async {
     try {
       DatabaseReference newSessionRef = _database.child('sessions').push();
       await newSessionRef.set({
@@ -77,7 +77,7 @@ class FirebaseService {
         "last_roll1": 1,
         "last_roll2": 1,
         "users": {
-          uid: {"name": admin, "is_admin": true, "turn_number": 1},
+          uid: {"name": admin_name, "is_admin": true, "turn_number": 1},
         },
         "current_turn_number": 1,
       });
@@ -243,6 +243,26 @@ class FirebaseService {
     } catch (e) {
       print('Error checking session: $e');
       rethrow;
+    }
+  }
+
+  Future<void> changeUserName(
+      String sessionCode, String uid, String newName) async {
+    try {
+      DatabaseReference ref = _database
+          .child('sessions')
+          .child(sessionCode)
+          .child('users')
+          .child(uid);
+      DataSnapshot snapshot = await ref.get();
+      if (snapshot.exists) {
+        Map<Object?, Object?> user = snapshot.value as Map<Object?, Object?>;
+        if (user['name'] != newName) {
+          await ref.update({'name': newName});
+        }
+      }
+    } catch (e) {
+      print('Error changing user name: $e');
     }
   }
 }

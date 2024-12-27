@@ -1,4 +1,5 @@
 import 'package:catan_board_generator/services/firebase_service.dart';
+import 'package:catan_board_generator/widgets/settings_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
@@ -9,9 +10,9 @@ class DiceSection extends StatefulWidget {
   final Future<List<int>> Function(bool updateFireBase) onRollDice;
   final int last_roll1;
   final int last_roll2;
-  final String userName;
-  final bool isAdmin;
-  final bool isTurn;
+  final String uid;
+  final int currentTurnNumber;
+  final List<Map<String, dynamic>> users_list;
 
   const DiceSection({
     Key? key,
@@ -19,9 +20,9 @@ class DiceSection extends StatefulWidget {
     required this.onRollDice,
     required this.last_roll1,
     required this.last_roll2,
-    required this.userName,
-    required this.isAdmin,
-    required this.isTurn,
+    required this.uid,
+    required this.currentTurnNumber,
+    required this.users_list,
   }) : super(key: key);
 
   @override
@@ -35,11 +36,24 @@ class _DiceSectionState extends State<DiceSection> {
 
   @override
   Widget build(BuildContext context) {
+    String userName = widget.users_list.firstWhere(
+        (element) => element['uid'] == widget.uid,
+        orElse: () => {'name': 'Unknown', 'uid': widget.uid})['name'];
+
+    bool isAdmin = widget.users_list.firstWhere(
+            (element) => element['uid'] == widget.uid,
+            orElse: () => {'is_admin': false})['is_admin'] ??
+        false;
+
+    String currentTurnPlayerName = widget.users_list.firstWhere(
+        (element) => element['turn_number'] == widget.currentTurnNumber,
+        orElse: () => {'name': 'Unknown'})['name'];
+
     return Column(
       mainAxisAlignment: MainAxisAlignment.spaceAround,
       children: [
         Text(
-          "Welcome, ${widget.userName}!",
+          "Welcome, ${userName}!",
           style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
@@ -62,12 +76,22 @@ class _DiceSectionState extends State<DiceSection> {
             textAlign: TextAlign.center,
           ),
         ),
+        Text(
+          "Current Turn player name:\n${currentTurnPlayerName}",
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+          textAlign: TextAlign.center,
+        ),
         GestureDetector(
-          onTap: !widget.isTurn
+          onTap: !(widget.users_list.firstWhere(
+                      (element) => element['uid'] == widget.uid,
+                      orElse: () => {'turn_number': -1})['turn_number'] ==
+                  widget.currentTurnNumber)
               ? null
               : () async {
-                  int currentTurn = await FirebaseService()
-                      .blockCurrentTurnForASecond(widget.sessionCode);
                   HapticFeedback.mediumImpact();
 
                   for (var i = 1; i <= _numOfFakeRolls; i++) {
@@ -78,10 +102,8 @@ class _DiceSectionState extends State<DiceSection> {
                           await widget.onRollDice(false);
                         } else {
                           await widget.onRollDice(true);
-                        }
-                        if (i == _numOfFakeRolls) {
                           await FirebaseService().increaseCurrentTurn(
-                              widget.sessionCode, currentTurn);
+                              widget.sessionCode, widget.currentTurnNumber);
                         }
                       },
                     );
@@ -100,19 +122,21 @@ class _DiceSectionState extends State<DiceSection> {
             ],
           ),
         ),
-        if (widget.isAdmin)
-          IconButton(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Admin!'),
-                  duration: const Duration(seconds: 1),
-                ),
-              );
-            },
-            icon: const Icon(Icons.settings),
-            iconSize: 50,
-          )
+        IconButton(
+          onPressed: () {
+            showDialog(
+              context: context,
+              builder: (context) => SettingsDialog(
+                sessionCode: widget.sessionCode,
+                uid: widget.uid,
+                isAdmin: isAdmin,
+                usersList: widget.users_list,
+              ),
+            );
+          },
+          icon: const Icon(Icons.settings),
+          iconSize: 50,
+        ),
       ],
     );
   }

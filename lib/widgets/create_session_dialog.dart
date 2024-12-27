@@ -22,7 +22,7 @@ class _CreateSessionDialogState extends State<CreateSessionDialog> {
 
   void _handleSubmit() {
     if (_formKey.currentState!.validate()) {
-      widget.onCreateSession(_nameController.text);
+      widget.onCreateSession(_nameController.text.trim());
       Navigator.of(context).pop();
     }
   }
@@ -38,7 +38,14 @@ class _CreateSessionDialogState extends State<CreateSessionDialog> {
           children: [
             TextFormField(
               controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Your Name'),
+              decoration: const InputDecoration(
+                labelText: 'Name',
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                alignLabelWithHint: false,
+                border: OutlineInputBorder(),
+              ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your name';

@@ -58,6 +58,18 @@ class _DiceScreenState extends State<DiceScreen>
                   );
                 }
 
+                // create a list of users where each item is a map with the user's uid and name
+                Map<dynamic, dynamic> usersMap =
+                    (snapshot.data?.snapshot.value as Map?)?['users'] ?? {};
+                List<Map<String, dynamic>> users = usersMap.entries
+                    .map((entry) => {
+                          'uid': entry.key,
+                          'name': entry.value['name'],
+                          'turn_number': entry.value['turn_number'],
+                          'is_admin': entry.value['is_admin'],
+                        })
+                    .toList();
+
                 return PageView(
                   scrollDirection: Axis.vertical,
                   onPageChanged: (index) {
@@ -67,20 +79,17 @@ class _DiceScreenState extends State<DiceScreen>
                   },
                   children: [
                     DiceSection(
-                        sessionCode: sessionCode!,
-                        onRollDice: _handleDiceRoll,
-                        last_roll1: (snapshot.data?.snapshot.value
-                            as Map?)?['last_roll1'],
-                        last_roll2: (snapshot.data?.snapshot.value
-                            as Map?)?['last_roll2'],
-                        userName: (snapshot.data?.snapshot.value
-                            as Map?)?['users'][playerUid]['name'],
-                        isAdmin: (snapshot.data?.snapshot.value
-                            as Map?)?['users'][playerUid]['is_admin'],
-                        isTurn: (snapshot.data?.snapshot.value
-                                as Map?)?['users'][playerUid]['turn_number'] ==
-                            (snapshot.data?.snapshot.value
-                                as Map?)?['current_turn_number']),
+                      sessionCode: sessionCode!,
+                      onRollDice: _handleDiceRoll,
+                      last_roll1: (snapshot.data?.snapshot.value
+                          as Map?)?['last_roll1'],
+                      last_roll2: (snapshot.data?.snapshot.value
+                          as Map?)?['last_roll2'],
+                      uid: playerUid!,
+                      currentTurnNumber: (snapshot.data?.snapshot.value
+                          as Map?)?['current_turn_number'],
+                      users_list: users,
+                    ),
                     StatsSection(sessionCode: sessionCode!),
                   ],
                 );
