@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:catan_board_generator/services/firebase_service.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -6,14 +8,12 @@ class SettingsDialog extends StatefulWidget {
   final String sessionCode;
   final String uid;
   final bool isAdmin;
-  final List<Map<String, dynamic>> usersList;
 
   const SettingsDialog({
     Key? key,
     required this.sessionCode,
     required this.uid,
     required this.isAdmin,
-    required this.usersList,
   }) : super(key: key);
 
   @override
@@ -24,21 +24,52 @@ class _SettingsDialogState extends State<SettingsDialog> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _nameController = TextEditingController();
 
+  StreamSubscription<DatabaseEvent>? _usersSubscription;
+  List<Map<dynamic, dynamic>> _usersList = [];
+
   @override
   void initState() {
     super.initState();
-    // Initialize name from usersList
-    final currentUser = widget.usersList.firstWhere(
-      (user) => user['uid'] == widget.uid,
-      orElse: () => {'name': ''},
-    );
-    _nameController.text = currentUser['name'] ?? '';
+    _usersSubscription =
+        FirebaseService().getUsersStream(widget.sessionCode).listen((snapshot) {
+      List<Map<dynamic, dynamic>> docs = (snapshot.snapshot.value as Map)
+          .entries
+          .map((entry) => {'uid': entry.key, ...entry.value})
+          .toList();
+      docs.sort((a, b) => a['turn_number'].compareTo(b['turn_number']));
+
+      setState(() {
+        _usersList = docs;
+        final currentUser = _usersList.firstWhere(
+          (user) => user['uid'] == widget.uid,
+          orElse: () => {'name': '?'},
+        );
+        _nameController.text = currentUser['name'] ?? '?';
+      });
+    });
+
+    print("In settings dialog, Users list: $_usersList");
   }
 
   @override
   void dispose() {
     _nameController.dispose();
     super.dispose();
+  }
+
+  Future<void> _reorderUsers(int oldIndex, int newIndex) async {
+    _usersSubscription?.pause();
+    final list = [..._usersList];
+    if (oldIndex < newIndex) newIndex -= 1;
+    final item = list.removeAt(oldIndex);
+    list.insert(newIndex, item);
+
+    setState(() {
+      _usersList = list; // show new order locally
+    });
+
+    await FirebaseService().updateTurnOrder(widget.sessionCode, list);
+    _usersSubscription?.resume();
   }
 
   void _handleSubmit() async {
@@ -80,43 +111,16 @@ class _SettingsDialogState extends State<SettingsDialog> {
               ),
               if (widget.isAdmin)
                 Expanded(
-                  child: StreamBuilder<DatabaseEvent>(
-                    stream: FirebaseDatabase.instance
-                        .ref()
-                        .child('sessions')
-                        .child(widget.sessionCode)
-                        .child('users')
-                        .onValue,
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-
-                      Map<dynamic, dynamic> usersMap =
-                          (snapshot.data?.snapshot.value as Map?) ?? {};
-
-                      List<String> _users = usersMap.values
-                          .map((user) => user['name'].toString())
-                          .toList();
-
-                      return ReorderableListView(
-                        shrinkWrap: true,
-                        onReorder: (oldIndex, newIndex) {
-                          setState(() {
-                            if (newIndex > oldIndex) newIndex--;
-                            final item = _users.removeAt(oldIndex);
-                            _users.insert(newIndex, item);
-                          });
-                        },
-                        children: [
-                          for (var i = 0; i < _users.length; i++)
-                            ListTile(
-                              key: ValueKey(_users[i]),
-                              title: Text(_users[i]),
-                            )
-                        ],
-                      );
-                    },
+                  child: ReorderableListView(
+                    shrinkWrap: true,
+                    onReorder: _reorderUsers,
+                    children: [
+                      for (final user in _usersList)
+                        ListTile(
+                          key: ValueKey(user['uid']),
+                          title: Text(user['name']),
+                        )
+                    ],
                   ),
                 ),
             ],

@@ -6,7 +6,6 @@ import 'package:share_plus/share_plus.dart';
 
 class DiceSection extends StatefulWidget {
   final String sessionCode;
-  // Add onRollDice callback, which is a function that returns a Future<int>
   final Future<List<int>> Function(bool updateFireBase) onRollDice;
   final int last_roll1;
   final int last_roll2;
@@ -130,7 +129,6 @@ class _DiceSectionState extends State<DiceSection> {
                 sessionCode: widget.sessionCode,
                 uid: widget.uid,
                 isAdmin: isAdmin,
-                usersList: widget.users_list,
               ),
             );
           },

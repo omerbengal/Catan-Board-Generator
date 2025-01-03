@@ -10,17 +10,6 @@ class FirebaseService {
     _database = FirebaseDatabase.instance.ref();
   }
 
-  // Future<Map<String, dynamic>?> getSessionRolls(String sessionCode) async {
-  //   try {
-  //     DataSnapshot snapshot =
-  //         await _database.child('sessions/$sessionCode').get();
-  //     return snapshot.value as Map<String, dynamic>?;
-  //   } catch (e) {
-  //     print('Error getting session rolls: $e');
-  //     return null;
-  //   }
-  // }
-
   Future<void> updateRoll(
       String sessionCode, int roll1Value, int roll2Value) async {
     int rollValue = roll1Value + roll2Value;
@@ -77,7 +66,12 @@ class FirebaseService {
         "last_roll1": 1,
         "last_roll2": 1,
         "users": {
-          uid: {"name": admin_name, "is_admin": true, "turn_number": 1},
+          uid: {
+            "uid": uid,
+            "name": admin_name,
+            "is_admin": true,
+            "turn_number": 1
+          },
         },
         "current_turn_number": 1,
       });
@@ -106,6 +100,7 @@ class FirebaseService {
             }
           }
           users[uid] = {
+            "uid": uid,
             "name": name,
             "is_admin": false,
             "turn_number": maxTurnNumber + 1
@@ -263,6 +258,57 @@ class FirebaseService {
       }
     } catch (e) {
       print('Error changing user name: $e');
+    }
+  }
+
+  // Future<List<Map<String, Map<String, dynamic>>>> getUsersAsList(
+  //     String sessionCode) async {
+  //   final List<Map<String, Map<String, dynamic>>> resultList = [];
+  //   try {
+  //     final ref = _database.child('sessions').child(sessionCode).child('users');
+  //     final snapshot = await ref.get();
+  //     if (snapshot.exists) {
+  //       final Map<Object?, Object?> data =
+  //           snapshot.value as Map<Object?, Object?>;
+  //       data.forEach((key, value) {
+  //         resultList
+  //             .add({key as String: Map<String, dynamic>.from(value as Map)});
+  //       });
+  //     }
+  //   } catch (e) {
+  //     print('Error getting users: $e');
+  //   }
+  //   return resultList;
+  // }
+
+  Stream<DatabaseEvent> getUsersStream(String sessionCode) {
+    final ref = _database.child('sessions').child(sessionCode).child('users');
+    return ref.onValue;
+  }
+
+  Future<void> updateTurnOrder(
+      String sessionCode, List<Map<dynamic, dynamic>> newOrderList) async {
+    try {
+      DatabaseReference ref =
+          _database.child('sessions').child(sessionCode).child('users');
+      DataSnapshot snapshot = await ref.get();
+      if (snapshot.exists) {
+        Map<Object?, Object?> session = snapshot.value as Map<Object?, Object?>;
+        // weirdly enough, the snapshot.value is the map of the entire session instead of the users... even though we're getting the users ref
+        // so we have to get the users map from the session map ⬇︎
+        Map<Object?, Object?> users = session['users'] as Map<Object?, Object?>;
+        // go through the new order list and update the turn numbers
+        for (int i = 0; i < newOrderList.length; i++) {
+          String uid = newOrderList[i]['uid'] as String;
+          Map<Object?, Object?> user = users[uid] as Map<Object?, Object?>;
+          user['turn_number'] = i + 1;
+
+          users[uid] = user;
+        }
+        await ref.set(users);
+      }
+    } catch (e) {
+      print('Error updating turn order: $e');
     }
   }
 }
