@@ -1,3 +1,4 @@
+import 'package:catan_board_generator/widgets/create_session_dialog.dart';
 import 'package:catan_board_generator/widgets/join_session_dialog.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import '../widgets/dice_section.dart';
 import '../widgets/stats_section.dart';
 import '../services/firebase_service.dart';
 import 'dart:math';
+import '../utils/id_generator.dart';
 
 class DiceScreen extends StatefulWidget {
   const DiceScreen({Key? key}) : super(key: key);
@@ -17,10 +19,8 @@ class DiceScreen extends StatefulWidget {
 class _DiceScreenState extends State<DiceScreen>
     with AutomaticKeepAliveClientMixin<DiceScreen> {
   String? sessionCode;
-  String? playerName;
+  String? playerUid;
   int currentPage = 0;
-  bool isLoading = false;
-  bool hasCheckedSession = false; // New flag to track session checking
 
   @override
   bool get wantKeepAlive => true;
@@ -58,6 +58,18 @@ class _DiceScreenState extends State<DiceScreen>
                   );
                 }
 
+                // create a list of users where each item is a map with the user's uid and name
+                Map<dynamic, dynamic> usersMap =
+                    (snapshot.data?.snapshot.value as Map?)?['users'] ?? {};
+                List<Map<String, dynamic>> users = usersMap.entries
+                    .map((entry) => {
+                          'uid': entry.key,
+                          'name': entry.value['name'],
+                          'turn_number': entry.value['turn_number'],
+                          'is_admin': entry.value['is_admin'],
+                        })
+                    .toList();
+
                 return PageView(
                   scrollDirection: Axis.vertical,
                   onPageChanged: (index) {
@@ -73,6 +85,10 @@ class _DiceScreenState extends State<DiceScreen>
                           as Map?)?['last_roll1'],
                       last_roll2: (snapshot.data?.snapshot.value
                           as Map?)?['last_roll2'],
+                      uid: playerUid!,
+                      currentTurnNumber: (snapshot.data?.snapshot.value
+                          as Map?)?['current_turn_number'],
+                      users_list: users,
                     ),
                     StatsSection(sessionCode: sessionCode!),
                   ],
@@ -83,22 +99,32 @@ class _DiceScreenState extends State<DiceScreen>
   }
 
   void _handleCreateSession() async {
-    String? newSessionCode = await FirebaseService().createSession();
-    setState(() {
-      sessionCode = newSessionCode;
-    });
+    String uid = IdGenerator.generateUniqueId();
+    showDialog(
+      context: context,
+      builder: (context) => CreateSessionDialog(
+        onCreateSession: (name) async {
+          final code = await FirebaseService().createSession(name, uid);
+          setState(() {
+            sessionCode = code;
+            playerUid = uid;
+          });
+        },
+      ),
+    );
   }
 
-  void _handleJoinSession() {
+  void _handleJoinSession() async {
+    String uid = IdGenerator.generateUniqueId();
     showDialog(
       context: context,
       builder: (context) => JoinSessionDialog(
-        onJoin: (code, name) {
-          FirebaseService().checkIfSessionExists(code).then((exists) {
-            if (exists) {
+        onJoin: (code, name) async {
+          await FirebaseService().joinSession(code, name, uid).then((joined) {
+            if (joined) {
               setState(() {
                 sessionCode = code;
-                playerName = name;
+                playerUid = uid;
               });
             } else {
               ScaffoldMessenger.of(context).showSnackBar(

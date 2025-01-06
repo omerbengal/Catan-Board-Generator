@@ -13,29 +13,63 @@ class JoinSessionDialog extends StatefulWidget {
 }
 
 class _JoinSessionDialogState extends State<JoinSessionDialog> {
+  final _formKey = GlobalKey<FormState>();
   final _codeController = TextEditingController();
   final _nameController = TextEditingController();
+
+  void _handleSubmit() {
+    if (_formKey.currentState!.validate()) {
+      widget.onJoin(_codeController.text, _nameController.text.trim());
+      Navigator.pop(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: const Text('Join Session'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: _codeController,
-            decoration: const InputDecoration(
-              labelText: 'Session Code',
+      content: Form(
+        key: _formKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextFormField(
+              controller: _codeController,
+              decoration: const InputDecoration(
+                labelText: 'Session Code',
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                alignLabelWithHint: false,
+                border: OutlineInputBorder(),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a session code';
+                }
+                return null;
+              },
             ),
-          ),
-          TextField(
-            controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: 'Your Name',
+            const SizedBox(height: 16),
+            TextFormField(
+              controller: _nameController,
+              decoration: const InputDecoration(
+                labelText: 'Name',
+                floatingLabelBehavior: FloatingLabelBehavior.always,
+                contentPadding:
+                    EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                alignLabelWithHint: false,
+                border: OutlineInputBorder(),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your name';
+                }
+                return null;
+              },
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       actions: [
         TextButton(
@@ -43,10 +77,7 @@ class _JoinSessionDialogState extends State<JoinSessionDialog> {
           child: const Text('Cancel'),
         ),
         TextButton(
-          onPressed: () {
-            widget.onJoin(_codeController.text, _nameController.text);
-            Navigator.pop(context);
-          },
+          onPressed: _handleSubmit,
           child: const Text('Join'),
         ),
       ],

@@ -83,6 +83,9 @@ class _ExpansionBoardScreenState extends State<ExpansionBoardScreen>
   var desertIndex2;
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
     super.build(context);
     var offSetX_1 = MediaQuery.of(context).size.width * 0.1775;
@@ -1005,9 +1008,6 @@ class _ExpansionBoardScreenState extends State<ExpansionBoardScreen>
       ],
     );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 
   // old (and not working) randomize:
   // void randomize() {
