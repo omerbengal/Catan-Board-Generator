@@ -6,7 +6,7 @@ class FirebaseService {
       'https://catan-board-generator-27696-default-rtdb.europe-west1.firebasedatabase.app';
 
   FirebaseService() {
-    FirebaseDatabase.instance.databaseURL = DATABASE_URL;
+    // FirebaseDatabase.instance.databaseURL = DATABASE_URL;
     _database = FirebaseDatabase.instance.ref();
   }
 
@@ -294,9 +294,18 @@ class FirebaseService {
       DataSnapshot snapshot = await ref.get();
       if (snapshot.exists) {
         Map<Object?, Object?> session = snapshot.value as Map<Object?, Object?>;
-        // weirdly enough, the snapshot.value is the map of the entire session instead of the users... even though we're getting the users ref
-        // so we have to get the users map from the session map ⬇︎
-        Map<Object?, Object?> users = session['users'] as Map<Object?, Object?>;
+        // weirdly enough, only on mobile, the snapshot.value is the map of the entire session instead of the users... even though we're getting the users ref
+        // so we have to get the users map from the session map IF WE ARE ON MOBILE ⬇︎
+
+        Map<Object?, Object?> users;
+
+        // check if "users" is a key in the session map
+        if (session.containsKey('users')) {
+          users = session['users'] as Map<Object?, Object?>;
+        } else {
+          // if it's not, we're on web, so we can just use the session map as the users map
+          users = session;
+        }
         // go through the new order list and update the turn numbers
         for (int i = 0; i < newOrderList.length; i++) {
           String uid = newOrderList[i]['uid'] as String;
