@@ -26,6 +26,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
 
   StreamSubscription<DatabaseEvent>? _usersSubscription;
   List<Map<dynamic, dynamic>> _usersList = [];
+  List<Map<dynamic, dynamic>> _oldUsersList = [];
 
   @override
   void initState() {
@@ -63,13 +64,10 @@ class _SettingsDialogState extends State<SettingsDialog> {
     if (oldIndex < newIndex) newIndex -= 1;
     final item = list.removeAt(oldIndex);
     list.insert(newIndex, item);
-
     setState(() {
       _usersList = list; // show new order locally
+      _oldUsersList = list; // keep old order for cancel
     });
-
-    await FirebaseService().updateTurnOrder(widget.sessionCode, list);
-    _usersSubscription?.resume();
   }
 
   void _handleSubmit() async {
@@ -78,6 +76,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
           widget.sessionCode, widget.uid, _nameController.text.trim());
       Navigator.of(context).pop();
     }
+    await FirebaseService().updateTurnOrder(widget.sessionCode, _usersList);
+    _usersSubscription?.resume();
   }
 
   @override
@@ -130,6 +130,10 @@ class _SettingsDialogState extends State<SettingsDialog> {
       actions: [
         TextButton(
           onPressed: () {
+            // Reset users list to the old order
+            setState(() {
+              _usersList = _oldUsersList;
+            });
             Navigator.of(context).pop();
           },
           child: const Text('Close'),
