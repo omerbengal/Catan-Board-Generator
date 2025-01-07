@@ -1,4 +1,6 @@
+import 'package:catan_board_generator/providers/game_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class JoinSessionDialog extends StatefulWidget {
   final Function(String code, String name) onJoin;
@@ -26,6 +28,10 @@ class _JoinSessionDialogState extends State<JoinSessionDialog> {
 
   @override
   Widget build(BuildContext context) {
+    // create a game provider
+    final gameProvider = Provider.of<GameProvider>(context);
+    final usersList = gameProvider.usersList;
+
     return AlertDialog(
       title: const Text('Join Session'),
       content: Form(
@@ -64,6 +70,9 @@ class _JoinSessionDialogState extends State<JoinSessionDialog> {
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter your name';
+                }
+                if (usersList.any((user) => user['name'] == value.trim())) {
+                  return 'Name already taken';
                 }
                 return null;
               },
