@@ -13,15 +13,29 @@ class GameProvider with ChangeNotifier {
   int _lastRoll2 = 1;
   List<Map<String, dynamic>> _usersList = [];
 
+  // for canceling user order changes
+  List<Map<String, dynamic>> _oldUserList = [];
+
   String? get sessionCode => _sessionCode;
   String? get playerUid => _playerUid;
   int get currentTurnNumber => _currentTurnNumber;
   int get lastRoll1 => _lastRoll1;
   int get lastRoll2 => _lastRoll2;
   List<Map<String, dynamic>> get usersList => _usersList;
+  List<Map<String, dynamic>> get oldUserList => _oldUserList;
+
   // set user list
   set usersList(List<Map<String, dynamic>> value) {
     _usersList = value;
+    notifyListeners();
+  }
+
+  set oldUserList(List<Map<String, dynamic>> value) {
+    _oldUserList = value;
+  }
+
+  void cancelUserOrderChanges() {
+    _usersList = _oldUserList;
     notifyListeners();
   }
 
@@ -120,10 +134,61 @@ class GameProvider with ChangeNotifier {
     }
   }
 
-  void reorderUsers(int oldIndex, int newIndex) {
-    if (oldIndex < _usersList.length && newIndex < _usersList.length) {
-      final item = _usersList.removeAt(oldIndex);
-      _usersList.insert(newIndex, item);
+  Future<void> reorderUsers(int oldIndex, int newIndex) async {
+    // if (oldIndex < _usersList.length && newIndex < _usersList.length) {
+    //   final item = _usersList.removeAt(oldIndex);
+    //   newIndex = newIndex > oldIndex ? newIndex - 1 : newIndex;
+    //   _usersList.insert(newIndex, item);
+    // } else if (newIndex == _usersList.length) {
+    //   // move to the end
+    //   final item = _usersList.removeAt(oldIndex);
+    //   _usersList.add(item);
+    // } else {
+    //   print("what is this?!?!?: oldIndex: $oldIndex, newIndex: $newIndex");
+    // }
+    // notifyListeners();
+
+    _oldUserList = List<Map<String, dynamic>>.from(_usersList);
+    if (oldIndex < newIndex) {
+      newIndex -= 1;
+    }
+    final user = _usersList.removeAt(oldIndex);
+    _usersList.insert(newIndex, user);
+    notifyListeners();
+  }
+
+  Future<void> updateUserListBecauseOfTurnChange(
+      List<Map<dynamic, dynamic>> newOrderList) async {
+    _loadSessionData(); // in order to get the current turn number
+    if (_sessionCode != null) {
+      for (int i = 0; i < newOrderList.length; i++) {
+        int turnNumberWithRespectToCurrentTurnNumber = _currentTurnNumber + i;
+        if (turnNumberWithRespectToCurrentTurnNumber > newOrderList.length) {
+          turnNumberWithRespectToCurrentTurnNumber -= newOrderList.length;
+        }
+
+        await FirebaseService().updateUserTurnNumber(
+          _sessionCode!,
+          newOrderList[i]['uid'],
+          turnNumberWithRespectToCurrentTurnNumber,
+        );
+      }
+      _loadSessionData();
+      notifyListeners();
+    }
+  }
+
+  Future<void> shuffleUsers() async {
+    if (_sessionCode != null) {
+      final shuffled = List<Map<String, dynamic>>.from(_usersList)..shuffle();
+      for (int i = 0; i < shuffled.length; i++) {
+        await FirebaseService().updateUserTurnNumber(
+          _sessionCode!,
+          shuffled[i]['uid'],
+          i + 1,
+        );
+      }
+      _loadSessionData();
       notifyListeners();
     }
   }

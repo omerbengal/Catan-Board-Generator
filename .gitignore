@@ -10,7 +10,7 @@ bin/internal/engine.version
 *.log
 *.pyc
 *.swp
-.DS_Store
+**/.DS_Store
 .atom/
 .buildlog/
 .history

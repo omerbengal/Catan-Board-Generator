@@ -1,5 +1,4 @@
 import 'package:catan_board_generator/providers/game_provider.dart';
-import 'package:catan_board_generator/services/firebase_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,7 +8,9 @@ class SettingsDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final gameProvider = Provider.of<GameProvider>(context);
-    final sessionCode = gameProvider.sessionCode;
+
+    gameProvider.oldUserList = List.from(gameProvider.usersList);
+
     final currentUser = gameProvider.usersList.firstWhere(
       (user) => user['uid'] == gameProvider.playerUid,
       orElse: () => {'name': 'Unknown'},
@@ -63,10 +64,18 @@ class SettingsDialog extends StatelessWidget {
                     children: usersList.map((user) {
                       return ListTile(
                         key: ValueKey(user['uid']),
-                        title: Text(user['name']),
+                        title: Text(
+                            '${usersList.indexOf(user) + 1}. ${user['name']}'),
                       );
                     }).toList(),
                   ),
+                ),
+              if (isAdmin)
+                ElevatedButton(
+                  onPressed: () async {
+                    await gameProvider.shuffleUsers();
+                  },
+                  child: const Text('Shuffle'),
                 ),
             ],
           ),
@@ -75,6 +84,7 @@ class SettingsDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () {
+            gameProvider.usersList = gameProvider.oldUserList;
             Navigator.of(context).pop();
           },
           child: const Text('Close'),
@@ -85,7 +95,7 @@ class SettingsDialog extends StatelessWidget {
               if (nameController.text != userName) {
                 gameProvider.updateUserName(nameController.text);
               }
-              await FirebaseService().updateTurnOrder(sessionCode!, usersList);
+              await gameProvider.updateUserListBecauseOfTurnChange(usersList);
               Navigator.of(context).pop();
             }
           },
