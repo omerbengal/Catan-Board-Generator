@@ -109,28 +109,6 @@ class GameProvider with ChangeNotifier {
           notifyListeners();
         }
       });
-      //   Map<dynamic, dynamic>? data =
-      //       await FirebaseService().getSessionData(_sessionCode!);
-      //   if (data != null) {
-      //     _currentTurnNumber = data['current_turn_number'];
-      //     _lastRoll1 = data['last_roll1'];
-      //     _lastRoll2 = data['last_roll2'];
-      //     _usersList = [];
-      //     if (data['users'] != null) {
-      //       (data['users'] as Map<dynamic, dynamic>).forEach((key, value) {
-      //         _usersList.add({
-      //           'uid': value['uid'],
-      //           'name': value['name'],
-      //           'turn_number': value['turn_number'],
-      //           'is_admin': value['is_admin'],
-      //         });
-      //       });
-      //       _usersList
-      //           .sort((a, b) => a['turn_number'].compareTo(b['turn_number']));
-      //     }
-      //     notifyListeners();
-      //   }
-      // }
     }
   }
 

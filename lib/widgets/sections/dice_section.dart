@@ -1,5 +1,5 @@
 import 'package:catan_board_generator/providers/game_provider.dart';
-import 'package:catan_board_generator/widgets/settings_dialog.dart';
+import 'package:catan_board_generator/widgets/dialogs/settings_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -14,7 +14,6 @@ class DiceSection extends StatelessWidget {
       (user) => user['uid'] == gameProvider.playerUid,
       orElse: () => {'name': 'Unknown', 'uid': ''},
     );
-    final isAdmin = currentUser['is_admin'] ?? false;
     final currentTurnUser = usersList.firstWhere(
       (user) => user['turn_number'] == gameProvider.currentTurnNumber,
       orElse: () => {'name': 'Unknown'},
@@ -69,7 +68,6 @@ class DiceSection extends StatelessWidget {
                     currentUser['turn_number'] == gameProvider.currentTurnNumber
                         ? () async {
                             await gameProvider.rollDice();
-                            //! only if it is the user's turn!!!!!!!!!!!
                           }
                         : null,
                 child: Row(
