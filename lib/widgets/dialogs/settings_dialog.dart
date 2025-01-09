@@ -9,7 +9,13 @@ class SettingsDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     final gameProvider = Provider.of<GameProvider>(context);
 
-    gameProvider.oldUserList = List.from(gameProvider.usersList);
+    if (gameProvider
+            .settingsDialogCounterForSavingOldUserListOnlyTheFirstTime ==
+        0) {
+      gameProvider.oldUserList = List.from(gameProvider.usersList);
+      gameProvider.settingsDialogCounterForSavingOldUserListOnlyTheFirstTime =
+          1;
+    }
 
     final currentUser = gameProvider.usersList.firstWhere(
       (user) => user['uid'] == gameProvider.playerUid,
@@ -72,8 +78,8 @@ class SettingsDialog extends StatelessWidget {
                 ),
               if (isAdmin)
                 ElevatedButton(
-                  onPressed: () async {
-                    await gameProvider.shuffleUsers();
+                  onPressed: () {
+                    gameProvider.shuffleUsers();
                   },
                   child: const Text('Shuffle'),
                 ),
@@ -84,7 +90,11 @@ class SettingsDialog extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () {
-            gameProvider.usersList = gameProvider.oldUserList;
+            if (gameProvider.oldUserList.isNotEmpty) {
+              gameProvider.usersList = gameProvider.oldUserList;
+            }
+            gameProvider
+                .settingsDialogCounterForSavingOldUserListOnlyTheFirstTime = 0;
             Navigator.of(context).pop();
           },
           child: const Text('Close'),
@@ -96,6 +106,8 @@ class SettingsDialog extends StatelessWidget {
                 gameProvider.updateUserName(nameController.text);
               }
               await gameProvider.updateUserListBecauseOfTurnChange(usersList);
+              gameProvider
+                  .settingsDialogCounterForSavingOldUserListOnlyTheFirstTime = 0;
               Navigator.of(context).pop();
             }
           },

@@ -16,6 +16,14 @@ class GameProvider with ChangeNotifier {
   // for canceling user order changes
   List<Map<String, dynamic>> _oldUserList = [];
 
+  // This field helps the settings dialog restore the "old" list (from the first time the dialog is opened)
+  // The issue was that when reordering or shuffeling the list, the state of the list is being changed in the provider,
+  // and then if we "simply" add oldUserList = userList in the beginning of the settings dialog,
+  // then every change will rebuild the dialog (because of the dialog listening to the provider)
+  // and then the "old"-ness of the oldUserList won't be true...
+  // So the dialog perform oldUserList = userList ONLY IF this field below is 0.
+  int _settingsDialogCounterForSavingOldUserListOnlyTheFirstTime = 0;
+
   String? get sessionCode => _sessionCode;
   String? get playerUid => _playerUid;
   int get currentTurnNumber => _currentTurnNumber;
@@ -23,6 +31,8 @@ class GameProvider with ChangeNotifier {
   int get lastRoll2 => _lastRoll2;
   List<Map<String, dynamic>> get usersList => _usersList;
   List<Map<String, dynamic>> get oldUserList => _oldUserList;
+  int get settingsDialogCounterForSavingOldUserListOnlyTheFirstTime =>
+      _settingsDialogCounterForSavingOldUserListOnlyTheFirstTime;
 
   // set user list
   set usersList(List<Map<String, dynamic>> value) {
@@ -34,6 +44,10 @@ class GameProvider with ChangeNotifier {
     _oldUserList = value;
   }
 
+  set settingsDialogCounterForSavingOldUserListOnlyTheFirstTime(int value) {
+    _settingsDialogCounterForSavingOldUserListOnlyTheFirstTime = value;
+  }
+
   void cancelUserOrderChanges() {
     _usersList = _oldUserList;
     notifyListeners();
@@ -43,8 +57,8 @@ class GameProvider with ChangeNotifier {
     _sessionCode = null;
     _playerUid = null;
     _currentTurnNumber = 0;
-    _lastRoll1 = 1; // Changed from 0 to 1
-    _lastRoll2 = 1; // Changed from 0 to 1
+    _lastRoll1 = 0;
+    _lastRoll2 = 0;
     _usersList = [];
     notifyListeners();
   }
@@ -148,7 +162,6 @@ class GameProvider with ChangeNotifier {
     // }
     // notifyListeners();
 
-    _oldUserList = List<Map<String, dynamic>>.from(_usersList);
     if (oldIndex < newIndex) {
       newIndex -= 1;
     }
@@ -173,22 +186,29 @@ class GameProvider with ChangeNotifier {
           turnNumberWithRespectToCurrentTurnNumber,
         );
       }
-      _loadSessionData();
+      _loadSessionData(); // to get the updated user list
       notifyListeners();
     }
   }
 
-  Future<void> shuffleUsers() async {
+  // Future<void> shuffleUsers() async {
+  //   if (_sessionCode != null) {
+  //     final shuffled = List<Map<String, dynamic>>.from(_usersList)..shuffle();
+  //     for (int i = 0; i < shuffled.length; i++) {
+  //       await FirebaseService().updateUserTurnNumber(
+  //         _sessionCode!,
+  //         shuffled[i]['uid'],
+  //         i + 1,
+  //       );
+  //     }
+  //     _loadSessionData();
+  //     notifyListeners();
+  //   }
+  // }
+
+  void shuffleUsers() {
     if (_sessionCode != null) {
-      final shuffled = List<Map<String, dynamic>>.from(_usersList)..shuffle();
-      for (int i = 0; i < shuffled.length; i++) {
-        await FirebaseService().updateUserTurnNumber(
-          _sessionCode!,
-          shuffled[i]['uid'],
-          i + 1,
-        );
-      }
-      _loadSessionData();
+      _usersList = List<Map<String, dynamic>>.from(_usersList)..shuffle();
       notifyListeners();
     }
   }
