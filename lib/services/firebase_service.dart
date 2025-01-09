@@ -14,9 +14,6 @@ class FirebaseService {
     try {
       DatabaseReference ref = _database.ref('sessions/$sessionCode');
       DatabaseEvent event = await ref.once();
-      // if (snapshot.exists) {
-      //   return Map<String, dynamic>.from(snapshot.value as Map);
-      // }
       if (event.snapshot.value != null) {
         return Map<String, dynamic>.from(event.snapshot.value as Map);
       }
@@ -30,33 +27,9 @@ class FirebaseService {
       String sessionCode, int roll1Value, int roll2Value) async {
     int rollValue = roll1Value + roll2Value;
     try {
-      // DatabaseReference ref = _database.child('sessions').child(sessionCode);
       DatabaseReference ref = _database.ref('sessions/$sessionCode');
       DatabaseEvent event = await ref.once();
       if (event.snapshot.value != null) {
-        // Map<Object?, Object?> snapshotMap =
-        //     snapshot.value as Map<Object?, Object?>;
-        // List<dynamic> rolls = snapshotMap['rolls'] as List<dynamic>;
-        // // chop off the first 2 elements, which are null
-        // rolls = rolls.sublist(2);
-        // rolls[rollValue - 2] = rolls[rollValue - 2] + 1;
-        // await ref.update({
-        //   'rolls': {
-        //     "2": rolls[0],
-        //     "3": rolls[1],
-        //     "4": rolls[2],
-        //     "5": rolls[3],
-        //     "6": rolls[4],
-        //     "7": rolls[5],
-        //     "8": rolls[6],
-        //     "9": rolls[7],
-        //     "10": rolls[8],
-        //     "11": rolls[9],
-        //     "12": rolls[10],
-        //   },
-        //   "last_roll1": roll1Value,
-        //   "last_roll2": roll2Value,
-        // });
         Map<Object?, Object?> snapshotMap =
             event.snapshot.value as Map<Object?, Object?>;
         List<dynamic> rolls = snapshotMap['rolls'] as List<dynamic>;
@@ -124,9 +97,6 @@ class FirebaseService {
 
   Future<bool> joinSession(String sessionCode, String name, String uid) async {
     try {
-      // DatabaseReference ref =
-      //     _database.child('sessions').child(sessionCode).child('users');
-      // DataSnapshot snapshot = await ref.get();
       DatabaseReference ref = _database.ref('sessions/$sessionCode/users');
       DatabaseEvent event = await ref.once();
       if (event.snapshot.value != null) {
@@ -159,27 +129,8 @@ class FirebaseService {
     return false;
   }
 
-  // Future<int> blockCurrentTurnForASecond(String sessionCode) async {
-  //   try {
-  //     DatabaseReference ref = _database.child('sessions').child(sessionCode);
-  //     DataSnapshot snapshot = await ref.get();
-  //     if (snapshot.exists) {
-  //       Map<Object?, Object?> snapshotMap =
-  //           snapshot.value as Map<Object?, Object?>;
-  //       int currentTurnNumber = snapshotMap['current_turn_number'] as int;
-  //       await ref.update({'current_turn_number': -1});
-  //       return currentTurnNumber;
-  //     }
-  //   } catch (e) {
-  //     print('Error blocking current turn: $e');
-  //   }
-  //   return 0;
-  // }
-
   Future<void> increaseCurrentTurn(String sessionCode) async {
     try {
-      // DatabaseReference ref = _database.child('sessions').child(sessionCode);
-      // DataSnapshot snapshot = await ref.get();
       DatabaseReference ref = _database.ref('sessions/$sessionCode');
       DatabaseEvent event = await ref.once();
       if (event.snapshot.value != null) {
@@ -192,6 +143,19 @@ class FirebaseService {
       }
     } catch (e) {
       print('Error updating current turn: $e');
+    }
+  }
+
+  Future<void> updateUserTurnNumber(
+      String sessionCode, String uid, int newTurnNumber) async {
+    try {
+      DatabaseReference ref = _database.ref('sessions/$sessionCode/users/$uid');
+      DatabaseEvent event = await ref.once();
+      if (event.snapshot.value != null) {
+        await ref.update({'turn_number': newTurnNumber});
+      }
+    } catch (e) {
+      print('Error updating user turn number: $e');
     }
   }
 
