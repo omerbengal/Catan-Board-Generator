@@ -1,7 +1,9 @@
 ✅ ⁠implement random player order for the game
-• Settings dialog load when waiting for the DB to be updated
+✅ Settings dialog load when waiting for the DB to be updated
 • ⁠only when player marked that he finished his turn we move to the next player
 • ⁠timer mode? X seconds per turn
 • ⁠Players can exit session (and they disappear in the DB...)
 • ⁠Admin can delete player
 • ⁠⁠Admin can make other players admins
+
+🪲 In settings dialog - change name + change order of users = name field resets...
