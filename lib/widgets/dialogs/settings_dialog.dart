@@ -27,6 +27,17 @@ class SettingsDialog extends StatelessWidget {
     final usersList = gameProvider.usersList;
     final formKey = GlobalKey<FormState>();
 
+    if (gameProvider.isLoading) {
+      return AlertDialog(
+        title: const Text('Settings'),
+        content: Container(
+          width: 300,
+          height: 400,
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      );
+    }
+
     return AlertDialog(
       title: const Text('Settings'),
       content: Container(
@@ -93,8 +104,13 @@ class SettingsDialog extends StatelessWidget {
             if (gameProvider.oldUserList.isNotEmpty) {
               gameProvider.usersList = gameProvider.oldUserList;
             }
+
+            // We exit the dialog, so we need to reset the counter to 0
+            // we do this so the next time we open the dialog, we can save the
+            // (Future) current user list
             gameProvider
                 .settingsDialogCounterForSavingOldUserListOnlyTheFirstTime = 0;
+
             Navigator.of(context).pop();
           },
           child: const Text('Close'),
@@ -102,12 +118,27 @@ class SettingsDialog extends StatelessWidget {
         TextButton(
           onPressed: () async {
             if (formKey.currentState!.validate()) {
-              if (nameController.text != userName) {
-                gameProvider.updateUserName(nameController.text);
+              bool changedName = nameController.text != userName;
+              bool changedList =
+                  gameProvider.usersList == gameProvider.oldUserList;
+              if (changedName || changedList) {
+                gameProvider.isLoading = true;
+                if (changedName) {
+                  await gameProvider.updateUserName(nameController.text);
+                }
+                if (changedList) {
+                  await gameProvider.updateUserListBecauseOfTurnChange(
+                      gameProvider.usersList);
+                }
+                gameProvider.isLoading = false;
+
+                // We exit the dialog, so we need to reset the counter to 0
+                // we do this so the next time we open the dialog, we can save the
+                // (Future) current user list
+                gameProvider
+                    .settingsDialogCounterForSavingOldUserListOnlyTheFirstTime = 0;
               }
-              await gameProvider.updateUserListBecauseOfTurnChange(usersList);
-              gameProvider
-                  .settingsDialogCounterForSavingOldUserListOnlyTheFirstTime = 0;
+
               Navigator.of(context).pop();
             }
           },

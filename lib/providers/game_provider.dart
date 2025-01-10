@@ -24,6 +24,8 @@ class GameProvider with ChangeNotifier {
   // So the dialog perform oldUserList = userList ONLY IF this field below is 0.
   int _settingsDialogCounterForSavingOldUserListOnlyTheFirstTime = 0;
 
+  bool _isLoading = false;
+
   String? get sessionCode => _sessionCode;
   String? get playerUid => _playerUid;
   int get currentTurnNumber => _currentTurnNumber;
@@ -33,6 +35,7 @@ class GameProvider with ChangeNotifier {
   List<Map<String, dynamic>> get oldUserList => _oldUserList;
   int get settingsDialogCounterForSavingOldUserListOnlyTheFirstTime =>
       _settingsDialogCounterForSavingOldUserListOnlyTheFirstTime;
+  bool get isLoading => _isLoading;
 
   // set user list
   set usersList(List<Map<String, dynamic>> value) {
@@ -46,6 +49,11 @@ class GameProvider with ChangeNotifier {
 
   set settingsDialogCounterForSavingOldUserListOnlyTheFirstTime(int value) {
     _settingsDialogCounterForSavingOldUserListOnlyTheFirstTime = value;
+  }
+
+  set isLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
   }
 
   void cancelUserOrderChanges() {
@@ -140,7 +148,7 @@ class GameProvider with ChangeNotifier {
     }
   }
 
-  void updateUserName(String newName) async {
+  Future<void> updateUserName(String newName) async {
     if (_sessionCode != null && _playerUid != null) {
       await FirebaseService()
           .changeUserName(_sessionCode!, _playerUid!, newName);
