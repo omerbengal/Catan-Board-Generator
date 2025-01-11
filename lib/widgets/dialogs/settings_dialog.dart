@@ -120,7 +120,7 @@ class SettingsDialog extends StatelessWidget {
             if (formKey.currentState!.validate()) {
               bool changedName = nameController.text != userName;
               bool changedList =
-                  gameProvider.usersList == gameProvider.oldUserList;
+                  gameProvider.usersList != gameProvider.oldUserList;
               if (changedName || changedList) {
                 gameProvider.isLoading = true;
                 if (changedName) {
