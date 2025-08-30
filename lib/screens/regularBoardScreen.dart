@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'dart:math' as math;
 import 'package:animated_button/animated_button.dart';
+import 'package:catan_board_generator/utils/stable_shuffle.dart';
 
 class RegularBoardScreen extends StatefulWidget {
   const RegularBoardScreen({Key? key}) : super(key: key);
@@ -691,11 +692,10 @@ class _RegularBoardScreenState extends State<RegularBoardScreen>
   }
 
   void randomize() {
-    boardResources.shuffle();
+    // Use stable shuffle algorithm for guaranteed balanced boards
+    boardResources = StableShuffle.generateStableBoard(isExpansion: false);
+    boardNumbers = StableShuffle.generateStableNumbers(boardResources, isExpansion: false);
     desertIndex = boardResources.indexOf('Desert');
-    boardNumbers.shuffle();
-    boardNumbers[boardNumbers.indexOf('d')] = boardNumbers[desertIndex];
-    boardNumbers[desertIndex] = 'd';
     upsideDownOrNot.shuffle();
   }
 }

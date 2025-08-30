@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'dart:math' as math;
 import 'package:animated_button/animated_button.dart';
+import 'package:catan_board_generator/utils/stable_shuffle.dart';
 
 class ExpansionBoardScreen extends StatefulWidget {
   const ExpansionBoardScreen({Key? key}) : super(key: key);
@@ -1023,24 +1024,11 @@ class _ExpansionBoardScreenState extends State<ExpansionBoardScreen>
   // }
 
   void randomize() {
-    boardResources.shuffle();
+    // Use stable shuffle algorithm for guaranteed balanced boards
+    boardResources = StableShuffle.generateStableBoard(isExpansion: true);
+    boardNumbers = StableShuffle.generateStableNumbers(boardResources, isExpansion: true);
     desertIndex1 = boardResources.indexOf('Desert');
     desertIndex2 = boardResources.lastIndexOf('Desert');
-
-    // Create a new list of numbers without 'd'
-    List<String> tempBoardNumbers = List.from(boardNumbers)
-      ..removeWhere((number) => number == 'd');
-
-    // Shuffle the list of numbers
-    tempBoardNumbers.shuffle();
-
-    // Insert 'd' at the desert positions
-    tempBoardNumbers.insert(desertIndex1, 'd');
-    tempBoardNumbers.insert(desertIndex2, 'd');
-
-    // Replace the original boardNumbers with the newly arranged numbers
-    boardNumbers = tempBoardNumbers;
-
     upsideDownOrNot.shuffle();
   }
 
